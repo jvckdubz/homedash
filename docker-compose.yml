@@ -1,0 +1,13 @@
+services:
+  homedash:
+    build: .
+    container_name: homedash
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NODE_ENV=production
+      - PORT=3080
+      - HTTPS_PORT=3443

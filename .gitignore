@@ -1,0 +1,32 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+
+# Data files (user data)
+data/config.json
+data/payments.json
+data/templates.json
+data/monitoring.json
+data/tasks.json
+data/ssh_keys/
+data/ssl/
+data/icons/*.png
+data/icons/*.jpg
+data/icons/*.svg
+data/icons/*.ico
+
+# Environment
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
