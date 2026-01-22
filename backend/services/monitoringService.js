@@ -3,7 +3,7 @@ const path = require('path');
 const fetch = require('node-fetch');
 const https = require('https');
 const { Client: SSHClient } = require('ssh2');
-const { MONITORING_FILE, SSH_KEYS_DIR, fetchWithSSL, loadConfig } = require('../utils/config');
+const { MONITORING_FILE, SSH_KEYS_DIR, fetchWithSSL, loadConfig, loadPayments, loadTasks } = require('../utils/config');
 const { sendTelegramMessage } = require('../utils/telegram');
 
 class MonitoringService {
@@ -13,6 +13,7 @@ class MonitoringService {
     this.lastStatus = {};   // cardId -> 'up' | 'down' | 'unknown'
     this.isRunning = false;
     this.config = null;
+    this.dailySummaryTimeout = null;
   }
 
   async init() {
@@ -519,10 +520,14 @@ Time: ${timeStr}`;
 
     this.isRunning = true;
     console.log(`[Monitoring] Started monitoring for ${startedCount} cards (skipped ${skippedCount})`);
+    
+    // Запускаем планировщик ежедневного отчёта
+    this.scheduleDailyReport();
   }
 
   // Остановка всего мониторинга
   stop() {
+    this.stopDailyReport();
     Object.keys(this.intervals).forEach(cardId => {
       this.stopCardMonitoring(cardId);
     });
@@ -576,6 +581,240 @@ Time: ${timeStr}`;
       result[cardId] = this.getCardStatus(cardId);
     });
     return result;
+  }
+
+  // ==================== ЕЖЕДНЕВНЫЙ ОТЧЁТ ====================
+
+  // Отправка ежедневного отчёта
+  async sendDailyReport() {
+    if (!this.config?.settings?.telegram?.enabled) {
+      console.log('[DailyReport] Telegram disabled, skipping');
+      return;
+    }
+
+    const { botToken, chatId, dailySummaryTopicId } = this.config.settings.telegram;
+    if (!botToken || !chatId) {
+      console.log('[DailyReport] Telegram not configured');
+      return;
+    }
+
+    try {
+      const lines = ['📊 <b>Ежедневный отчёт HomeDash</b>', ''];
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      // === 1. Приближающиеся платежи ===
+      const payments = await loadPayments();
+      const upcomingPayments = [];
+
+      // Провайдеры
+      for (const provider of (payments.providers || [])) {
+        if (!provider.nextPayment) continue;
+        const paymentDate = new Date(provider.nextPayment);
+        paymentDate.setHours(0, 0, 0, 0);
+        const daysUntil = Math.ceil((paymentDate - now) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntil <= 7) {
+          upcomingPayments.push({
+            name: provider.name,
+            amount: `${provider.amount} ${provider.currency || '₽'}`,
+            daysUntil
+          });
+        }
+      }
+
+      // Карточки с биллингом
+      for (const card of (this.config.cards || [])) {
+        if (!card.billing?.enabled || !card.billing?.nextPayment) continue;
+        const paymentDate = new Date(card.billing.nextPayment);
+        paymentDate.setHours(0, 0, 0, 0);
+        const daysUntil = Math.ceil((paymentDate - now) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntil <= 7) {
+          upcomingPayments.push({
+            name: card.name,
+            amount: `${card.billing.amount} ${card.billing.currency || '₽'}`,
+            daysUntil
+          });
+        }
+      }
+
+      if (upcomingPayments.length > 0) {
+        lines.push('💳 <b>Платежи (ближайшие 7 дней):</b>');
+        upcomingPayments
+          .sort((a, b) => a.daysUntil - b.daysUntil)
+          .forEach(p => {
+            const status = p.daysUntil <= 0 ? '🔴' : p.daysUntil <= 3 ? '🟡' : '🟢';
+            const daysText = p.daysUntil <= 0 
+              ? 'просрочен' 
+              : p.daysUntil === 1 
+                ? 'завтра' 
+                : `через ${p.daysUntil} дн.`;
+            lines.push(`${status} ${p.name}: ${p.amount} (${daysText})`);
+          });
+        lines.push('');
+      }
+
+      // === 2. Задачи с дедлайнами ===
+      const tasksData = await loadTasks();
+      const upcomingTasks = (tasksData.tasks || [])
+        .filter(t => !t.completed && t.dueDate)
+        .map(t => {
+          const dueDate = new Date(t.dueDate);
+          dueDate.setHours(0, 0, 0, 0);
+          const daysUntil = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+          return { ...t, daysUntil };
+        })
+        .filter(t => t.daysUntil <= 7)
+        .sort((a, b) => a.daysUntil - b.daysUntil);
+
+      if (upcomingTasks.length > 0) {
+        lines.push('📋 <b>Задачи (ближайшие 7 дней):</b>');
+        upcomingTasks.forEach(t => {
+          const status = t.daysUntil <= 0 ? '🔴' : t.daysUntil <= 3 ? '🟡' : '🟢';
+          const daysText = t.daysUntil <= 0 
+            ? 'просрочена' 
+            : t.daysUntil === 1 
+              ? 'завтра' 
+              : `через ${t.daysUntil} дн.`;
+          lines.push(`${status} ${t.title} (${daysText})`);
+        });
+        lines.push('');
+      }
+
+      // === 3. Статус сервисов ===
+      const statuses = this.getAllStatuses();
+      const statusCounts = { up: 0, down: 0, unknown: 0 };
+      const downServices = [];
+
+      Object.entries(statuses).forEach(([cardId, data]) => {
+        const status = data.status || 'unknown';
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
+        if (status === 'down') {
+          const card = (this.config.cards || []).find(c => c.id === cardId);
+          if (card) downServices.push(card.name);
+        }
+      });
+
+      const totalMonitored = statusCounts.up + statusCounts.down + statusCounts.unknown;
+      if (totalMonitored > 0) {
+        lines.push(`🖥 <b>Сервисы:</b> ${statusCounts.up}/${totalMonitored} онлайн`);
+        if (downServices.length > 0) {
+          lines.push(`⚠️ Недоступны: ${downServices.join(', ')}`);
+        }
+        lines.push('');
+      }
+
+      // === 4. Проверка обновлений ===
+      try {
+        const latestVersion = await this.checkGitHubUpdate();
+        
+        let currentVersion = '1.0.0';
+        const pkgPath = process.env.NODE_ENV === 'production' 
+          ? '/app/package.json' 
+          : path.join(__dirname, '..', 'package.json');
+        try {
+          const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf8'));
+          currentVersion = pkg.version || currentVersion;
+        } catch {}
+
+        if (latestVersion && this.compareVersions(currentVersion, latestVersion) < 0) {
+          lines.push(`🆕 <b>Доступно обновление:</b> v${currentVersion} → v${latestVersion}`);
+          lines.push('');
+        }
+      } catch (err) {
+        console.log('[DailyReport] Update check failed:', err.message);
+      }
+
+      // === Отправка ===
+      if (lines.length <= 2) {
+        lines.push('✅ Нет приближающихся платежей и задач');
+      }
+
+      const message = lines.join('\n');
+      await sendTelegramMessage(botToken, chatId, message, dailySummaryTopicId);
+      console.log('[DailyReport] Daily report sent');
+
+    } catch (err) {
+      console.error('[DailyReport] Failed to send:', err.message);
+    }
+  }
+
+  // Проверка обновлений на GitHub
+  checkGitHubUpdate() {
+    return new Promise((resolve) => {
+      const options = {
+        hostname: 'api.github.com',
+        path: '/repos/jvckdubz/homedash/releases/latest',
+        headers: { 'User-Agent': 'HomeDash-Update-Checker' }
+      };
+
+      https.get(options, (response) => {
+        let data = '';
+        response.on('data', chunk => data += chunk);
+        response.on('end', () => {
+          try {
+            if (response.statusCode === 200) {
+              const release = JSON.parse(data);
+              resolve(release.tag_name?.replace(/^v/, '') || null);
+            } else {
+              resolve(null);
+            }
+          } catch { resolve(null); }
+        });
+      }).on('error', () => resolve(null));
+    });
+  }
+
+  // Сравнение версий
+  compareVersions(v1, v2) {
+    const p1 = v1.split('.').map(Number);
+    const p2 = v2.split('.').map(Number);
+    for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
+      if ((p1[i] || 0) < (p2[i] || 0)) return -1;
+      if ((p1[i] || 0) > (p2[i] || 0)) return 1;
+    }
+    return 0;
+  }
+
+  // Планирование ежедневного отчёта
+  scheduleDailyReport() {
+    if (!this.config?.settings?.telegram?.dailySummary) {
+      console.log('[DailyReport] Daily report disabled');
+      return;
+    }
+
+    const reportTime = this.config?.settings?.telegram?.dailySummaryTime || '09:00';
+    const [hours, minutes] = reportTime.split(':').map(Number);
+
+    const scheduleNext = () => {
+      const now = new Date();
+      const next = new Date();
+      next.setHours(hours, minutes, 0, 0);
+      
+      if (next <= now) {
+        next.setDate(next.getDate() + 1);
+      }
+
+      const delay = next - now;
+      console.log(`[DailyReport] Next report scheduled at ${next.toLocaleString()}`);
+
+      this.dailySummaryTimeout = setTimeout(async () => {
+        await this.sendDailyReport();
+        scheduleNext();
+      }, delay);
+    };
+
+    scheduleNext();
+  }
+
+  // Остановка планировщика
+  stopDailyReport() {
+    if (this.dailySummaryTimeout) {
+      clearTimeout(this.dailySummaryTimeout);
+      this.dailySummaryTimeout = null;
+      console.log('[DailyReport] Scheduler stopped');
+    }
   }
 }
 

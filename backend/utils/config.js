@@ -71,7 +71,10 @@ async function loadConfig() {
           chatId: "",
           notifyDown: true,
           notifyUp: true,
-          notifyDegraded: false
+          notifyDegraded: false,
+          dailySummary: false,
+          dailySummaryTime: "09:00",
+          dailySummaryTopicId: ""
         }
       },
       categories: [

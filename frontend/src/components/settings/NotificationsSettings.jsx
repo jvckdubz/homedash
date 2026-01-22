@@ -59,22 +59,27 @@ function NotificationsSettings({ formData, setFormData }) {
     setTestingTopic(topicType);
     setTestResult(null);
 
-    const messages = {
-      down: '🔴 <b>Тест: Сервис недоступен</b>\n\nПример уведомления о недоступности сервиса.',
-      up: '✅ <b>Тест: Сервис восстановлен</b>\n\nПример уведомления о восстановлении сервиса.',
-      payments: '💳 <b>Тест: Напоминание о платеже</b>\n\n<b>Пример сервиса</b>\nСумма: 500 RUB\nСрок: через 3 дня',
-      tasks: '📋 <b>Тест: Напоминание о задаче</b>\n\n<b>Пример задачи</b>\nПриоритет: 🔴 Высокий\nСрок: завтра',
-      summary: `📊 <b>Ежедневная сводка</b>\n${new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}\n\n🔴 <b>Недоступные сервисы:</b>\n• Proxmox VE\n\n💳 <b>Платежи (7 дней):</b>\n⚠️• Hetzner: 1500 RUB (через 2д)\n• VDS: 500 RUB (через 5д)\n\n📋 <b>Задачи (7 дней):</b>\n⚠️• Обновить сервер (через 1д)\n• Бэкап БД (через 4д)`
-    };
-
     try {
-      const res = await api.post('/api/telegram/test', {
-        botToken: formData.telegram.botToken,
-        chatId: formData.telegram.chatId,
-        topicId: topicId || null,
-        message: messages[topicType]
-      });
-      setTestResult({ type: topicType, ...res });
+      // Для ежедневной сводки - вызываем реальный отчёт
+      if (topicType === 'summary') {
+        const res = await api.post('/api/monitoring/telegram/test-daily-report');
+        setTestResult({ type: topicType, ...res });
+      } else {
+        const messages = {
+          down: '🔴 <b>Тест: Сервис недоступен</b>\n\nПример уведомления о недоступности сервиса.',
+          up: '✅ <b>Тест: Сервис восстановлен</b>\n\nПример уведомления о восстановлении сервиса.',
+          payments: '💳 <b>Тест: Напоминание о платеже</b>\n\n<b>Пример сервиса</b>\nСумма: 500 RUB\nСрок: через 3 дня',
+          tasks: '📋 <b>Тест: Напоминание о задаче</b>\n\n<b>Пример задачи</b>\nПриоритет: 🔴 Высокий\nСрок: завтра'
+        };
+
+        const res = await api.post('/api/monitoring/telegram/test', {
+          botToken: formData.telegram.botToken,
+          chatId: formData.telegram.chatId,
+          topicId: topicId || null,
+          message: messages[topicType]
+        });
+        setTestResult({ type: topicType, ...res });
+      }
     } catch (err) {
       setTestResult({ type: topicType, success: false, error: err.message });
     } finally {

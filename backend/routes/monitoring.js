@@ -171,7 +171,7 @@ router.put('/settings', async (req, res) => {
 
 // Test Telegram connection
 router.post('/telegram/test', async (req, res) => {
-  const { botToken, chatId, topicId } = req.body;
+  const { botToken, chatId, topicId, message } = req.body;
 
   if (!botToken || !chatId) {
     return res.status(400).json({ error: 'botToken and chatId required' });
@@ -181,12 +181,26 @@ router.post('/telegram/test', async (req, res) => {
     await sendTelegramMessage(
       botToken, 
       chatId, 
-      'HomeDash test - connection successful!',
+      message || 'HomeDash test - connection successful!',
       topicId
     );
     res.json({ success: true, message: 'Test message sent' });
   } catch (err) {
     console.error('[Monitoring] POST /telegram/test error:', err.message);
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// Test daily report
+router.post('/telegram/test-daily-report', async (req, res) => {
+  try {
+    if (!monitoringService) {
+      return res.status(500).json({ error: 'Monitoring service not initialized' });
+    }
+    await monitoringService.sendDailyReport();
+    res.json({ success: true, message: 'Daily report sent' });
+  } catch (err) {
+    console.error('[Monitoring] POST /telegram/test-daily-report error:', err.message);
     res.status(400).json({ success: false, error: err.message });
   }
 });
