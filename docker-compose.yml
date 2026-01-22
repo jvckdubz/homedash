@@ -3,11 +3,18 @@ services:
     build: .
     container_name: homedash
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - "3000:3000"
+      - "3443:3443"
     volumes:
       - ./data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - NODE_ENV=production
-      - PORT=3080
-      - HTTPS_PORT=3443
+      - TZ=Europe/Moscow
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

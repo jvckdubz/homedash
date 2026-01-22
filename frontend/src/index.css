@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Spin animation for RefreshCw - fix oval rotation */
+.animate-spin {
+  animation: spin 1s linear infinite;
+  transform-origin: center center;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 :root {
   --bg-primary: #0d0d0f;
   --bg-secondary: #202123;

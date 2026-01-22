@@ -1,0 +1,18 @@
+module.exports = {
+  categories: require('./categories'),
+  cards: require('./cards'),
+  payments: require('./payments'),
+  providers: require('./providers'),
+  purchases: require('./purchases'),
+  tasks: require('./tasks'),
+  notes: require('./notes'),
+  integrations: require('./integrations'),
+  monitoring: require('./monitoring'),
+  system: require('./system'),
+  config: require('./config'),
+  icons: require('./icons'),
+  weather: require('./weather'),
+  ssh: require('./ssh'),
+  notifications: require('./notifications'),
+  discover: require('./discover')
+};

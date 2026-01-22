@@ -1,13 +1,12 @@
 node_modules
-frontend/node_modules
-backend/node_modules
+npm-debug.log
 .git
 .gitignore
-*.md
-!README.md
-docker-compose*.yml
 .env
 .env.*
+*.md
+!README.md
+data
 *.log
 .DS_Store
 Thumbs.db

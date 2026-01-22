@@ -24,6 +24,17 @@
       // This ensures updates are always applied
       (async function() {
         if ('serviceWorker' in navigator) {
+          // Skip SW on HTTPS with self-signed cert (will fail anyway)
+          // SW works on: localhost, HTTP, or trusted HTTPS
+          const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+          const isHttp = location.protocol === 'http:';
+          
+          if (!isLocalhost && !isHttp) {
+            // HTTPS with IP or domain - likely self-signed, skip SW to avoid errors
+            console.log('[Init] SW skipped (self-signed HTTPS)');
+            return;
+          }
+          
           try {
             // Clear all caches first
             if ('caches' in window) {
@@ -44,7 +55,8 @@
               console.log('[Init] SW registered');
             }
           } catch (err) {
-            console.log('[Init] SW setup error:', err);
+            // Silently ignore SW errors - app works without it
+            console.log('[Init] SW unavailable');
           }
         }
       })();
