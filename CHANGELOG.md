@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.1] - 2025-01-23
+
+### Added
+- Daily Telegram report with payments, tasks, services status, and update notifications
+- Test button for daily report sends real data
+
+### Fixed
+- Docker image path in update commands (ghcr.io/jvckdubz/homedash)
+- Version display after updates
+
 ## [1.1.0] - 2025-01-23
 
 ### Added

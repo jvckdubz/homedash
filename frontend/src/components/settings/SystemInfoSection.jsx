@@ -93,12 +93,15 @@ function SystemInfoSection() {
         commands: [
           `docker stop ${containerName}`,
           `docker rm ${containerName}`,
-          'docker pull jvckdubz/homedash:latest',
+          'docker pull ghcr.io/jvckdubz/homedash:latest',
           `docker run -d --name ${containerName} \\`,
           '  -p 3000:3000 \\',
-          '  -v /var/run/docker.sock:/var/run/docker.sock \\',
-          '  -v homedash-data:/app/data \\',
-          '  jvckdubz/homedash:latest'
+          '  -p 3443:3443 \\',
+          '  -v $(pwd)/data:/app/data \\',
+          '  -v /var/run/docker.sock:/var/run/docker.sock:ro \\',
+          '  -e TZ=Europe/Moscow \\',
+          '  --restart unless-stopped \\',
+          '  ghcr.io/jvckdubz/homedash:latest'
         ]
       };
     }
