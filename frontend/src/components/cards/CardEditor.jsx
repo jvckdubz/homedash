@@ -382,19 +382,19 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                           value={formData.customIcon || ''}
                           onChange={e => setFormData({...formData, customIcon: e.target.value || null})}
                           placeholder="https://example.com/icon.png"
-                          className="input flex-1 text-sm"
+                          className="input-field flex-1"
                         />
                         {formData.customIcon && (
                           <button
                             onClick={() => setFormData({ ...formData, customIcon: null })}
-                            className="p-2 bg-dark-700 hover:bg-dark-600 rounded-lg text-dark-400"
+                            className="px-3 bg-dark-700 hover:bg-dark-600 rounded-xl text-dark-400 transition-colors"
                             title="Очистить"
                           >
-                            <X size={16} />
+                            <X size={18} />
                           </button>
                         )}
                       </div>
-                      <p className="text-xs text-dark-500 mt-1">
+                      <p className="text-xs text-dark-500 mt-2">
                         Источники: <a href="https://simpleicons.org" target="_blank" rel="noopener" className="text-blue-400 hover:underline">SimpleIcons</a>, 
                         {' '}<a href="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/" target="_blank" rel="noopener" className="text-blue-400 hover:underline">Dashboard Icons</a>,
                         {' '}<a href="https://selfh.st/icons/" target="_blank" rel="noopener" className="text-blue-400 hover:underline">Selfh.st</a>
@@ -743,7 +743,7 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                     value={formData.customIcon || ''}
                     onChange={e => setFormData({...formData, customIcon: e.target.value || null})}
                     placeholder="URL иконки (https://...)"
-                    className="input text-sm mb-1"
+                    className="input-field mb-2"
                   />
                   <p className="text-xs text-dark-500">
                     <a href="https://simpleicons.org" target="_blank" rel="noopener" className="text-blue-400">SimpleIcons</a>
