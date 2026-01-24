@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.2] - 2025-01-23
+
+### Added
+- Custom icon URL field - use icons from any external source
+- Links to popular icon sources (SimpleIcons, Dashboard Icons, Selfh.st)
+
+### Changed
+- Icon selection UI improved with URL input field
+- "Fetch favicon" button only shows when no custom URL is set
+
 ## [1.1.1] - 2025-01-23
 
 ### Added
