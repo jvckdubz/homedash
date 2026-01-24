@@ -373,8 +373,52 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                 <>
                   <ColorPicker label="Цвет" value={formData.color} onChange={color => setFormData({...formData, color})} />
                   <div>
+                    {/* Внешняя иконка по URL */}
+                    <div className="mb-3">
+                      <label className="block text-sm text-dark-400 mb-1">Иконка по URL</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={formData.customIcon || ''}
+                          onChange={e => setFormData({...formData, customIcon: e.target.value || null})}
+                          placeholder="https://example.com/icon.png"
+                          className="input flex-1 text-sm"
+                        />
+                        {formData.customIcon && (
+                          <button
+                            onClick={() => setFormData({ ...formData, customIcon: null })}
+                            className="p-2 bg-dark-700 hover:bg-dark-600 rounded-lg text-dark-400"
+                            title="Очистить"
+                          >
+                            <X size={16} />
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-xs text-dark-500 mt-1">
+                        Источники: <a href="https://simpleicons.org" target="_blank" rel="noopener" className="text-blue-400 hover:underline">SimpleIcons</a>, 
+                        {' '}<a href="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/" target="_blank" rel="noopener" className="text-blue-400 hover:underline">Dashboard Icons</a>,
+                        {' '}<a href="https://selfh.st/icons/" target="_blank" rel="noopener" className="text-blue-400 hover:underline">Selfh.st</a>
+                      </p>
+                    </div>
+                    
+                    {/* Предпросмотр внешней иконки */}
+                    {formData.customIcon && (
+                      <div className="flex items-center gap-3 mb-3 p-3 bg-dark-800 rounded-xl">
+                        <img 
+                          src={formData.customIcon} 
+                          alt="Custom icon" 
+                          className="w-10 h-10 rounded-lg object-contain bg-dark-700"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                        <div className="flex-1">
+                          <div className="text-sm text-dark-300">Внешняя иконка</div>
+                          <div className="text-xs text-dark-500 truncate max-w-[200px]">{formData.customIcon}</div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Кнопка получения favicon */}
-                    {formData.url && (
+                    {formData.url && !formData.customIcon && (
                       <div className="mb-3">
                         <button
                           onClick={handleFetchFavicon}
@@ -387,27 +431,11 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                           ) : (
                             <Globe size={16} />
                           )}
-                          Получить favicon из URL
+                          Автоматически из URL сервиса
                         </button>
                         {faviconError && (
                           <p className="text-red-400 text-xs mt-2">{faviconError}</p>
                         )}
-                      </div>
-                    )}
-                    {/* Custom icon если есть */}
-                    {formData.customIcon && (
-                      <div className="flex items-center gap-3 mb-3 p-3 bg-dark-800 rounded-xl">
-                        <img src={formData.customIcon} alt="Custom icon" className="w-10 h-10 rounded-lg object-contain bg-dark-700" />
-                        <div className="flex-1">
-                          <div className="text-sm text-dark-300">Загруженная иконка</div>
-                        </div>
-                        <button
-                          onClick={() => setFormData({ ...formData, icon: 'server', customIcon: null })}
-                          className="p-2 hover:bg-dark-700 rounded-lg text-dark-400"
-                          title="Удалить"
-                        >
-                          <X size={16} />
-                        </button>
                       </div>
                     )}
                     
@@ -708,8 +736,46 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                   ))}
                 </div></div>
               <div><label className="block text-sm text-dark-400 mb-2">Иконка</label>
+                {/* Внешняя иконка по URL */}
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    value={formData.customIcon || ''}
+                    onChange={e => setFormData({...formData, customIcon: e.target.value || null})}
+                    placeholder="URL иконки (https://...)"
+                    className="input text-sm mb-1"
+                  />
+                  <p className="text-xs text-dark-500">
+                    <a href="https://simpleicons.org" target="_blank" rel="noopener" className="text-blue-400">SimpleIcons</a>
+                    {' · '}
+                    <a href="https://selfh.st/icons/" target="_blank" rel="noopener" className="text-blue-400">Selfh.st</a>
+                  </p>
+                </div>
+
+                {/* Предпросмотр внешней иконки */}
+                {formData.customIcon && (
+                  <div className="flex items-center gap-3 mb-3 p-3 bg-dark-800 rounded-xl">
+                    <img 
+                      src={formData.customIcon} 
+                      alt="Custom icon" 
+                      className="w-10 h-10 rounded-lg object-contain bg-dark-700"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm text-dark-300">Внешняя иконка</div>
+                      <div className="text-xs text-dark-500 truncate">{formData.customIcon}</div>
+                    </div>
+                    <button
+                      onClick={() => setFormData({ ...formData, customIcon: null })}
+                      className="p-2 hover:bg-dark-700 rounded-lg text-dark-400 flex-shrink-0"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+
                 {/* Кнопка получения favicon */}
-                {formData.url && (
+                {formData.url && !formData.customIcon && (
                   <div className="mb-3">
                     <button
                       onClick={handleFetchFavicon}
@@ -722,29 +788,11 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                       ) : (
                         <Globe size={16} />
                       )}
-                      Получить favicon из URL
+                      Автоматически из URL
                     </button>
                     {faviconError && (
                       <p className="text-red-400 text-xs mt-2">{faviconError}</p>
                     )}
-                  </div>
-                )}
-                
-                {/* Custom icon если есть */}
-                {formData.customIcon && (
-                  <div className="flex items-center gap-3 mb-3 p-3 bg-dark-800 rounded-xl">
-                    <img src={formData.customIcon} alt="Custom icon" className="w-10 h-10 rounded-lg object-contain bg-dark-700" />
-                    <div className="flex-1">
-                      <div className="text-sm text-dark-300">Загруженная иконка</div>
-                      <div className="text-xs text-dark-500">{formData.customIcon}</div>
-                    </div>
-                    <button
-                      onClick={() => setFormData({ ...formData, icon: 'server', customIcon: null })}
-                      className="p-2 hover:bg-dark-700 rounded-lg text-dark-400"
-                      title="Удалить"
-                    >
-                      <X size={16} />
-                    </button>
                   </div>
                 )}
                 
