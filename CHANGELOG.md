@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.3] - 2025-01-24
+
+### Added
+- Font Awesome 6.5 integration (100+ icons)
+- Icon picker with Lucide/Font Awesome tabs in payments
+- Brand icons: Spotify, Netflix, YouTube, Telegram, Discord, Steam, etc.
+- Category icons: utilities, transport, health, finance, etc.
+
+### Changed
+- Improved icon URL input styling (matches project design)
+
 ## [1.1.2] - 2025-01-23
 
 ### Added

@@ -7,7 +7,7 @@ import {
   Clock as ClockIcon, PieChart
 } from 'lucide-react';
 import api from '../../api';
-import { serviceIcons } from '../../constants/icons';
+import { serviceIcons, FaIcon, faIcons, faIconCategories } from '../../constants/icons';
 import { ColorPicker, providerIcons } from '../common';
 import TranslateWidget from '../common/TranslateWidget';
 
@@ -21,6 +21,7 @@ function PaymentsPage({ cards: initialCards, onBack, onEditCard, onViewCard, onR
   const [showAddPurchase, setShowAddPurchase] = useState(false);
   const [showAddChoice, setShowAddChoice] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false); // Спойлер иконок
+  const [iconPickerTab, setIconPickerTab] = useState('lucide'); // 'lucide' | 'fontawesome'
   const [showQrScanner, setShowQrScanner] = useState(false);
   const [showQrViewer, setShowQrViewer] = useState(null); // QR data for viewing
   const [qrCodes, setQrCodes] = useState({});
@@ -34,6 +35,15 @@ function PaymentsPage({ cards: initialCards, onBack, onEditCard, onViewCard, onR
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const scanIntervalRef = useRef(null);
+
+  // Хелпер для рендера иконки (Lucide или Font Awesome)
+  const renderIcon = (iconId, color, size = 20) => {
+    if (faIcons[iconId]) {
+      return <FaIcon icon={faIcons[iconId]} size={size} style={{ color }} />;
+    }
+    const IconComp = serviceIcons[iconId] || serviceIcons.default;
+    return <div style={{ width: size, height: size, color }}><IconComp /></div>;
+  };
 
   // Форма нового провайдера
   const [newProvider, setNewProvider] = useState({
@@ -435,7 +445,6 @@ function PaymentsPage({ cards: initialCards, onBack, onEditCard, onViewCard, onR
   }, 0);
 
   const renderPaymentItem = (item) => {
-    const IconComponent = serviceIcons[item.icon] || serviceIcons.default;
     const key = item.type === 'provider' ? `provider_${item.id}` : item.id;
     const itemQrCodes = qrCodes[key] || [];
     
@@ -456,7 +465,7 @@ function PaymentsPage({ cards: initialCards, onBack, onEditCard, onViewCard, onR
             {item.customIcon ? (
               <img src={item.customIcon} alt="" className="w-6 h-6 object-contain" />
             ) : (
-              <div className="w-5 h-5"><IconComponent /></div>
+              renderIcon(item.icon, item.color, 20)
             )}
           </div>
           
@@ -507,7 +516,6 @@ function PaymentsPage({ cards: initialCards, onBack, onEditCard, onViewCard, onR
     const item = paymentItem || { ...selectedItem.data, type: selectedItem.type };
     const key = selectedItem.type === 'provider' ? `provider_${item.id}` : item.id;
     const itemQrCodes = qrCodes[key] || [];
-    const IconComponent = serviceIcons[item.icon] || serviceIcons.default;
     const itemColor = item.color;
     const daysUntil = paymentItem?.daysUntil || 0;
     
@@ -544,7 +552,7 @@ function PaymentsPage({ cards: initialCards, onBack, onEditCard, onViewCard, onR
               <ArrowLeft size={20} />
             </button>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${itemColor}20`, color: itemColor }}>
-              <div className="w-5 h-5"><IconComponent /></div>
+              {renderIcon(item.icon, itemColor, 20)}
             </div>
             <div className="flex-1 min-w-0">
               <h1 className="text-lg font-semibold truncate">{item.name}</h1>
@@ -994,8 +1002,8 @@ function PaymentsPage({ cards: initialCards, onBack, onEditCard, onViewCard, onR
                 className="w-full flex items-center justify-between p-3 bg-dark-800 hover:bg-dark-700 rounded-xl transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-dark-700 flex items-center justify-center" style={{ color: newProvider.color }}>
-                    {React.createElement(serviceIcons[newProvider.icon] || serviceIcons.default)}
+                  <div className="w-8 h-8 rounded-lg bg-dark-700 flex items-center justify-center">
+                    {renderIcon(newProvider.icon, newProvider.color, 20)}
                   </div>
                   <span className="text-sm text-dark-400">Иконка</span>
                 </div>
@@ -1011,17 +1019,61 @@ function PaymentsPage({ cards: initialCards, onBack, onEditCard, onViewCard, onR
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <div className="grid grid-cols-8 gap-2 pt-3">
-                      {providerIcons.map(icon => {
-                        const IconComp = serviceIcons[icon.id] || serviceIcons.default;
-                        return (
-                          <button key={icon.id} onClick={() => { setNewProvider({...newProvider, icon: icon.id}); setShowIconPicker(false); }}
-                            className={`aspect-square flex items-center justify-center rounded-lg transition-colors ${newProvider.icon === icon.id ? 'bg-purple-500/30 ring-2 ring-purple-500' : 'bg-dark-700 hover:bg-dark-600'}`}
-                            title={icon.name}>
-                            <div className="w-5 h-5" style={{ color: newProvider.color }}><IconComp /></div>
-                          </button>
-                        );
-                      })}
+                    <div className="pt-3">
+                      {/* Вкладки */}
+                      <div className="flex gap-2 mb-3">
+                        <button
+                          onClick={() => setIconPickerTab('lucide')}
+                          className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${iconPickerTab === 'lucide' ? 'bg-purple-500/30 text-purple-300' : 'bg-dark-700 text-dark-400 hover:bg-dark-600'}`}
+                        >
+                          Lucide
+                        </button>
+                        <button
+                          onClick={() => setIconPickerTab('fontawesome')}
+                          className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${iconPickerTab === 'fontawesome' ? 'bg-purple-500/30 text-purple-300' : 'bg-dark-700 text-dark-400 hover:bg-dark-600'}`}
+                        >
+                          Font Awesome
+                        </button>
+                      </div>
+                      
+                      {/* Lucide иконки */}
+                      {iconPickerTab === 'lucide' && (
+                        <div className="grid grid-cols-8 gap-2">
+                          {providerIcons.map(icon => {
+                            const IconComp = serviceIcons[icon.id] || serviceIcons.default;
+                            return (
+                              <button key={icon.id} onClick={() => { setNewProvider({...newProvider, icon: icon.id}); setShowIconPicker(false); }}
+                                className={`aspect-square flex items-center justify-center rounded-lg transition-colors ${newProvider.icon === icon.id ? 'bg-purple-500/30 ring-2 ring-purple-500' : 'bg-dark-700 hover:bg-dark-600'}`}
+                                title={icon.name}>
+                                <div className="w-5 h-5" style={{ color: newProvider.color }}><IconComp /></div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                      
+                      {/* Font Awesome иконки */}
+                      {iconPickerTab === 'fontawesome' && (
+                        <div className="space-y-3 max-h-64 overflow-y-auto">
+                          {Object.entries(faIconCategories).map(([category, icons]) => (
+                            <div key={category}>
+                              <div className="text-xs text-dark-500 mb-2">{category}</div>
+                              <div className="grid grid-cols-8 gap-2">
+                                {icons.map(iconId => (
+                                  <button 
+                                    key={iconId} 
+                                    onClick={() => { setNewProvider({...newProvider, icon: iconId}); setShowIconPicker(false); }}
+                                    className={`aspect-square flex items-center justify-center rounded-lg transition-colors ${newProvider.icon === iconId ? 'bg-purple-500/30 ring-2 ring-purple-500' : 'bg-dark-700 hover:bg-dark-600'}`}
+                                    title={iconId}
+                                  >
+                                    <FaIcon icon={faIcons[iconId]} size={18} style={{ color: newProvider.color }} />
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}

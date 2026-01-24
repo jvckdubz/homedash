@@ -174,6 +174,124 @@ export const categoryIcons = {
   receipt: Receipt
 };
 
+// ============ Font Awesome Icon Component ============
+export const FaIcon = ({ icon, className = '', size = 16, style = {} }) => (
+  <i 
+    className={`${icon} ${className}`} 
+    style={{ fontSize: size, width: size, textAlign: 'center', ...style }}
+  />
+);
+
+// ============ Font Awesome Icons for Payments/Providers ============
+export const faIcons = {
+  // Платежи и финансы
+  'credit-card': 'fa-solid fa-credit-card',
+  'money-bill': 'fa-solid fa-money-bill',
+  'wallet': 'fa-solid fa-wallet',
+  'coins': 'fa-solid fa-coins',
+  'piggy-bank': 'fa-solid fa-piggy-bank',
+  'building-columns': 'fa-solid fa-building-columns',
+  'receipt': 'fa-solid fa-receipt',
+  'file-invoice': 'fa-solid fa-file-invoice-dollar',
+  
+  // Коммунальные услуги
+  'bolt': 'fa-solid fa-bolt',
+  'fire': 'fa-solid fa-fire',
+  'droplet': 'fa-solid fa-droplet',
+  'snowflake': 'fa-solid fa-snowflake',
+  'temperature-half': 'fa-solid fa-temperature-half',
+  'house': 'fa-solid fa-house',
+  'building': 'fa-solid fa-building',
+  
+  // Связь и интернет
+  'wifi': 'fa-solid fa-wifi',
+  'phone': 'fa-solid fa-phone',
+  'mobile': 'fa-solid fa-mobile-screen',
+  'tower-cell': 'fa-solid fa-tower-cell',
+  'satellite-dish': 'fa-solid fa-satellite-dish',
+  'globe': 'fa-solid fa-globe',
+  'envelope': 'fa-solid fa-envelope',
+  
+  // Транспорт
+  'car': 'fa-solid fa-car',
+  'gas-pump': 'fa-solid fa-gas-pump',
+  'bus': 'fa-solid fa-bus',
+  'train': 'fa-solid fa-train',
+  'plane': 'fa-solid fa-plane',
+  'bicycle': 'fa-solid fa-bicycle',
+  'motorcycle': 'fa-solid fa-motorcycle',
+  
+  // Развлечения и подписки
+  'tv': 'fa-solid fa-tv',
+  'film': 'fa-solid fa-film',
+  'music': 'fa-solid fa-music',
+  'gamepad': 'fa-solid fa-gamepad',
+  'headphones': 'fa-solid fa-headphones',
+  'book': 'fa-solid fa-book',
+  
+  // Бренды
+  'spotify': 'fa-brands fa-spotify',
+  'apple': 'fa-brands fa-apple',
+  'google': 'fa-brands fa-google',
+  'amazon': 'fa-brands fa-amazon',
+  'youtube': 'fa-brands fa-youtube',
+  'netflix': 'fa-brands fa-netflix',
+  'twitch': 'fa-brands fa-twitch',
+  'discord': 'fa-brands fa-discord',
+  'telegram': 'fa-brands fa-telegram',
+  'github': 'fa-brands fa-github',
+  'docker': 'fa-brands fa-docker',
+  'linux': 'fa-brands fa-linux',
+  'windows': 'fa-brands fa-windows',
+  'playstation': 'fa-brands fa-playstation',
+  'xbox': 'fa-brands fa-xbox',
+  'steam': 'fa-brands fa-steam',
+  'yandex': 'fa-brands fa-yandex',
+  'vk': 'fa-brands fa-vk',
+  
+  // Здоровье
+  'heart-pulse': 'fa-solid fa-heart-pulse',
+  'pills': 'fa-solid fa-pills',
+  'hospital': 'fa-solid fa-hospital',
+  'user-doctor': 'fa-solid fa-user-doctor',
+  'dumbbell': 'fa-solid fa-dumbbell',
+  
+  // Прочее
+  'shield': 'fa-solid fa-shield',
+  'lock': 'fa-solid fa-lock',
+  'cloud': 'fa-solid fa-cloud',
+  'server': 'fa-solid fa-server',
+  'database': 'fa-solid fa-database',
+  'box': 'fa-solid fa-box',
+  'gift': 'fa-solid fa-gift',
+  'cart-shopping': 'fa-solid fa-cart-shopping',
+  'store': 'fa-solid fa-store',
+  'utensils': 'fa-solid fa-utensils',
+  'mug-hot': 'fa-solid fa-mug-hot',
+  'paw': 'fa-solid fa-paw',
+  'baby': 'fa-solid fa-baby',
+  'graduation-cap': 'fa-solid fa-graduation-cap',
+  'briefcase': 'fa-solid fa-briefcase',
+  'calendar': 'fa-solid fa-calendar',
+  'clock': 'fa-solid fa-clock',
+  'bell': 'fa-solid fa-bell',
+  'star': 'fa-solid fa-star',
+  'crown': 'fa-solid fa-crown',
+  'gem': 'fa-solid fa-gem'
+};
+
+// Категории FA иконок для удобного выбора
+export const faIconCategories = {
+  'Финансы': ['credit-card', 'money-bill', 'wallet', 'coins', 'piggy-bank', 'building-columns', 'receipt', 'file-invoice'],
+  'Коммуналка': ['bolt', 'fire', 'droplet', 'snowflake', 'temperature-half', 'house', 'building'],
+  'Связь': ['wifi', 'phone', 'mobile', 'tower-cell', 'satellite-dish', 'globe', 'envelope'],
+  'Транспорт': ['car', 'gas-pump', 'bus', 'train', 'plane', 'bicycle', 'motorcycle'],
+  'Медиа': ['tv', 'film', 'music', 'gamepad', 'headphones', 'book'],
+  'Бренды': ['spotify', 'apple', 'google', 'amazon', 'youtube', 'netflix', 'twitch', 'discord', 'telegram', 'github', 'docker', 'steam', 'yandex', 'vk'],
+  'Здоровье': ['heart-pulse', 'pills', 'hospital', 'user-doctor', 'dumbbell'],
+  'Прочее': ['shield', 'lock', 'cloud', 'server', 'gift', 'cart-shopping', 'store', 'utensils', 'mug-hot', 'paw', 'baby', 'graduation-cap', 'briefcase', 'star', 'crown', 'gem']
+};
+
 // Preset colors for color picker
 export const presetColors = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e', '#10b981', '#14b8a6',
