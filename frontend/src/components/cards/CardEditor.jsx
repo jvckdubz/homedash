@@ -1523,7 +1523,7 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                   <button
                     onClick={addBookmark}
                     disabled={!newBookmark.name || !newBookmark.url}
-                    className="btn btn-primary px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn btn-primary px-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
                   >
                     <Plus size={18} /> Добавить
                   </button>
