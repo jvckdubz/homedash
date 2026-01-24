@@ -1,64 +1,83 @@
 # HomeDash
 
-Self-hosted dashboard for monitoring services and managing home infrastructure.
+[🇷🇺 Русский](#русский) | [🇬🇧 English](#english)
 
-## Overview
+---
 
-HomeDash is a web-based dashboard designed for home server environments. It provides a unified interface for monitoring services, tracking payments, managing tasks, and integrating with popular self-hosted applications.
+# Русский
 
-## Features
+Самохостный дашборд для мониторинга сервисов и управления домашней инфраструктурой.
 
-### Service Monitoring
-- Real-time HTTP/HTTPS health checks with configurable intervals
-- Visual status indicators (online/offline/degraded)
-- Response time tracking
-- Support for custom headers and authentication
+<details>
+<summary>📸 Скриншоты</summary>
 
-### Docker Integration
-- Container status monitoring via Docker socket
-- Portainer integration for multi-environment management
-- Display of container states, stacks, and environments
+![Dashboard](screenshots/dashboard.png)
+![Mobile](screenshots/mobile.png)
+![Payments](screenshots/payments.png)
 
-### Integrations
-- **Proxmox**: VM and container status
-- **Home Assistant**: Entity states and sensor data
-- **AdGuard Home**: Blocking statistics
-- **qBittorrent**: Download status and speeds
-- **Plex/Jellyfin**: Active streams and library stats
-- **Pi-hole**: Query and blocking metrics
-- **Uptime Kuma**: Monitor status aggregation
+</details>
 
-### Payment Management
-- Track recurring payments and subscriptions
-- Payment calendar with due date reminders
-- Provider management with card linking
-- Export/import functionality
+## Возможности
 
-### Tasks and Notes
-- Task management with priorities and due dates
-- Color-coded notes
-- Completion tracking
+### 🖥 Карточки сервисов
+- Организация сервисов по категориям
+- Кастомные иконки (Lucide, Font Awesome, внешние URL)
+- Цветовая маркировка
+- Закладки — несколько ссылок в одной карточке
 
-### Additional Features
-- Automatic update notifications via GitHub
-- Weather widget with OpenWeatherMap integration
-- Telegram notifications for service status changes
-- Multi-language support (Russian/English)
-- Responsive mobile interface
-- Customizable categories and icons
-- Dark theme
-- PWA support
+### 📡 Мониторинг
+- HTTP/HTTPS проверки доступности
+- Статистика uptime за 24 часа / 7 дней
+- Время отклика
+- Telegram-уведомления при падении/восстановлении сервисов
 
-## Requirements
+### 🔌 Интеграции
 
-- Docker and Docker Compose
-- Optional: Docker socket access for container monitoring
+| Сервис | Данные |
+|--------|--------|
+| **Proxmox VE** | CPU, RAM, VM/LXC статусы, uptime |
+| **Portainer** | Контейнеры, стеки, окружения |
+| **Docker** | Статусы контейнеров |
+| **Home Assistant** | Состояния сущностей, сенсоры |
+| **AdGuard Home** | Статистика блокировок, запросы |
+| **Nginx Proxy Manager** | Хосты, сертификаты |
+| **CrowdSec** | Alerts, decisions, bouncers |
+| **OpenWRT** | Сетевая статистика, клиенты |
+| **Wiki.js** | Статистика страниц |
+| **SSH** | Системная информация удалённых хостов |
 
-## Installation
+### 💳 Платежи и подписки
+- Отслеживание регулярных платежей
+- Напоминания о приближающихся оплатах
+- Привязка к карточкам сервисов
+- QR-коды для быстрой оплаты
+- История платежей
 
-### Docker Compose (recommended)
+### ✅ Задачи и заметки
+- Управление задачами с приоритетами
+- Дедлайны и напоминания
+- Цветные заметки
 
-Create a `docker-compose.yml`:
+### 🌤 Погода
+- Виджет текущей погоды
+- Интеграция с OpenWeatherMap или wttr.in
+
+### 📱 Telegram
+- Уведомления о статусе сервисов
+- Ежедневные отчёты (платежи, задачи, статус сервисов)
+- Поддержка топиков в группах
+
+### ⚙️ Дополнительно
+- Автоматические уведомления об обновлениях
+- Мультиязычность (Русский / English)
+- Адаптивный мобильный интерфейс
+- PWA — установка как приложение
+- Тёмная тема
+- Экспорт/импорт данных
+
+## Установка
+
+### Docker Compose (рекомендуется)
 
 ```yaml
 services:
@@ -75,8 +94,6 @@ services:
       - TZ=Europe/Moscow
     restart: unless-stopped
 ```
-
-Start the container:
 
 ```bash
 docker compose up -d
@@ -96,9 +113,149 @@ docker run -d \
   ghcr.io/jvckdubz/homedash:latest
 ```
 
-### Access
+Откройте `http://localhost:3000`
 
-Open `http://localhost:3000` in your browser.
+## Конфигурация
+
+### Тома
+
+| Путь | Описание |
+|------|----------|
+| `/app/data` | Данные приложения |
+| `/var/run/docker.sock` | Docker socket (опционально) |
+
+### Порты
+
+| Порт | Описание |
+|------|----------|
+| 3000 | HTTP |
+| 3443 | HTTPS (self-signed) |
+
+### Переменные окружения
+
+| Переменная | Описание | По умолчанию |
+|------------|----------|--------------|
+| `TZ` | Часовой пояс | `UTC` |
+
+## Обновление
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+---
+
+# English
+
+Self-hosted dashboard for monitoring services and managing home infrastructure.
+
+<details>
+<summary>📸 Screenshots</summary>
+
+![Dashboard](screenshots/dashboard.png)
+![Mobile](screenshots/mobile.png)
+![Payments](screenshots/payments.png)
+
+</details>
+
+## Features
+
+### 🖥 Service Cards
+- Organize services by categories
+- Custom icons (Lucide, Font Awesome, external URLs)
+- Color coding
+- Bookmarks — multiple links in one card
+
+### 📡 Monitoring
+- HTTP/HTTPS availability checks
+- Uptime statistics for 24h / 7 days
+- Response time tracking
+- Telegram notifications on status changes
+
+### 🔌 Integrations
+
+| Service | Data |
+|---------|------|
+| **Proxmox VE** | CPU, RAM, VM/LXC status, uptime |
+| **Portainer** | Containers, stacks, environments |
+| **Docker** | Container statuses |
+| **Home Assistant** | Entity states, sensors |
+| **AdGuard Home** | Blocking statistics, queries |
+| **Nginx Proxy Manager** | Hosts, certificates |
+| **CrowdSec** | Alerts, decisions, bouncers |
+| **OpenWRT** | Network stats, clients |
+| **Wiki.js** | Page statistics |
+| **SSH** | Remote host system info |
+
+### 💳 Payments & Subscriptions
+- Track recurring payments
+- Due date reminders
+- Link to service cards
+- QR codes for quick payment
+- Payment history
+
+### ✅ Tasks & Notes
+- Task management with priorities
+- Deadlines and reminders
+- Color-coded notes
+
+### 🌤 Weather
+- Current weather widget
+- OpenWeatherMap or wttr.in integration
+
+### 📱 Telegram
+- Service status notifications
+- Daily reports (payments, tasks, service status)
+- Group topics support
+
+### ⚙️ Additional
+- Automatic update notifications
+- Multi-language (Russian / English)
+- Responsive mobile interface
+- PWA support
+- Dark theme
+- Export/import data
+
+## Installation
+
+### Docker Compose (recommended)
+
+```yaml
+services:
+  homedash:
+    image: ghcr.io/jvckdubz/homedash:latest
+    container_name: homedash
+    ports:
+      - "3000:3000"
+      - "3443:3443"
+    volumes:
+      - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TZ=Europe/Moscow
+    restart: unless-stopped
+```
+
+```bash
+docker compose up -d
+```
+
+### Docker Run
+
+```bash
+docker run -d \
+  --name homedash \
+  -p 3000:3000 \
+  -p 3443:3443 \
+  -v $(pwd)/data:/app/data \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -e TZ=Europe/Moscow \
+  --restart unless-stopped \
+  ghcr.io/jvckdubz/homedash:latest
+```
+
+Open `http://localhost:3000`
 
 ## Configuration
 
@@ -106,15 +263,15 @@ Open `http://localhost:3000` in your browser.
 
 | Path | Description |
 |------|-------------|
-| `/app/data` | Persistent storage for cards, settings, and configuration |
-| `/var/run/docker.sock` | Docker socket for container monitoring (optional, read-only) |
+| `/app/data` | Application data |
+| `/var/run/docker.sock` | Docker socket (optional) |
 
 ### Ports
 
 | Port | Description |
 |------|-------------|
 | 3000 | HTTP |
-| 3443 | HTTPS (self-signed certificate) |
+| 3443 | HTTPS (self-signed) |
 
 ### Environment Variables
 
@@ -122,44 +279,16 @@ Open `http://localhost:3000` in your browser.
 |----------|-------------|---------|
 | `TZ` | Timezone | `UTC` |
 
-## Data Persistence
-
-All configuration data is stored in the `/app/data` volume:
-
-- `cards.json` - Service cards configuration
-- `config.json` - Application settings
-- `categories.json` - Custom categories
-- `tasks.json` - Tasks and notes
-- `providers.json` - Payment providers
-- `payments.json` - Payment records
-
-Data persists across container updates when the volume is mounted.
-
 ## Updating
-
-### Docker Compose
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-### Docker Run
+HomeDash automatically checks for updates and shows a notification in settings.
 
-```bash
-docker stop homedash
-docker rm homedash
-docker pull ghcr.io/jvckdubz/homedash:latest
-# Run the container again with the same parameters
-```
-
-## Building from Source
-
-```bash
-git clone https://github.com/jvckdubz/homedash.git
-cd homedash
-docker compose up -d --build
-```
+---
 
 ## License
 
@@ -167,5 +296,5 @@ MIT
 
 ## Links
 
-- [GitHub Repository](https://github.com/jvckdubz/homedash)
+- [GitHub](https://github.com/jvckdubz/homedash)
 - [Docker Image](https://ghcr.io/jvckdubz/homedash)
