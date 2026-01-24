@@ -4,7 +4,8 @@ import {
   X, Save, Server, Activity, Cloud, Wrench, Home, Shield, Globe,
   Check, AlertCircle, Eye, EyeOff, RefreshCw, ChevronDown, ChevronUp,
   Bell, Key, Upload, Clock as ClockIcon, Zap, FileText,
-  Palette, ArrowLeft, CheckCircle2, Wifi, Trash2, Radio, Signal
+  Palette, ArrowLeft, CheckCircle2, Wifi, Trash2, Radio, Signal,
+  Bookmark, Plus, ExternalLink, GripVertical
 } from 'lucide-react';
 import api from '../../api';
 import { translations } from '../../constants/translations';
@@ -20,14 +21,15 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
       return { 
         ...card, 
         monitoring: card.monitoring || { enabled: false },
-        billing: card.billing || { enabled: false }
+        billing: card.billing || { enabled: false },
+        bookmarks: card.bookmarks || []
       };
     }
     return {
       name: '', description: '', url: '', icon: 'server',
       category: categories[0]?.id || 'services', color: '#3b82f6', 
       integration: null, monitoring: { enabled: false },
-      billing: { enabled: false }
+      billing: { enabled: false }, bookmarks: []
     };
   });
   const [activeTab, setActiveTab] = useState(() => window.innerWidth < 768 ? null : 'general');
@@ -46,6 +48,42 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
   const [fetchingFavicon, setFetchingFavicon] = useState(false);
   const [faviconError, setFaviconError] = useState(null);
   const [showIconPickerEditor, setShowIconPickerEditor] = useState(false);
+  
+  // Bookmarks state
+  const [newBookmark, setNewBookmark] = useState({ name: '', url: '', description: '' });
+  const [editingBookmarkId, setEditingBookmarkId] = useState(null);
+
+  // Bookmark functions
+  const addBookmark = () => {
+    if (!newBookmark.name || !newBookmark.url) return;
+    const bookmark = {
+      id: Date.now().toString(),
+      name: newBookmark.name,
+      url: newBookmark.url.startsWith('http') ? newBookmark.url : `https://${newBookmark.url}`,
+      description: newBookmark.description
+    };
+    setFormData(prev => ({
+      ...prev,
+      bookmarks: [...(prev.bookmarks || []), bookmark]
+    }));
+    setNewBookmark({ name: '', url: '', description: '' });
+  };
+
+  const removeBookmark = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      bookmarks: (prev.bookmarks || []).filter(b => b.id !== id)
+    }));
+  };
+
+  const updateBookmark = (id, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      bookmarks: (prev.bookmarks || []).map(b => 
+        b.id === id ? { ...b, [field]: value } : b
+      )
+    }));
+  };
 
   // Fetch favicon from URL
   const handleFetchFavicon = async () => {
@@ -289,7 +327,8 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
     { id: 'integration', label: t('integration'), icon: Zap },
     { id: 'style', label: t('appearance'), icon: Palette },
     ...(isBillable ? [{ id: 'billing', label: t('billing'), icon: ClockIcon }] : []),
-    { id: 'monitoring', label: t('monitoring'), icon: Activity }
+    { id: 'monitoring', label: t('monitoring'), icon: Activity },
+    { id: 'bookmarks', label: 'Закладки', icon: Bookmark }
   ];
 
   const currentTab = tabs.find(t => t.id === activeTab);
@@ -583,6 +622,116 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                     <p className="text-sm text-dark-400">Сервис будет проверяться на доступность каждые N секунд (настройки в разделе Мониторинг)</p>
                   )}
                 </>
+              )}
+
+              {activeTab === 'bookmarks' && (
+                <div className="space-y-4">
+                  {/* Список закладок */}
+                  {(formData.bookmarks || []).length > 0 && (
+                    <div className="space-y-2">
+                      {(formData.bookmarks || []).map((bookmark, index) => (
+                        <div key={bookmark.id} className="p-3 bg-dark-800 rounded-xl">
+                          {editingBookmarkId === bookmark.id ? (
+                            <div className="space-y-2">
+                              <input
+                                type="text"
+                                value={bookmark.name}
+                                onChange={(e) => updateBookmark(bookmark.id, 'name', e.target.value)}
+                                className="input-field text-sm"
+                                placeholder="Название"
+                              />
+                              <input
+                                type="url"
+                                value={bookmark.url}
+                                onChange={(e) => updateBookmark(bookmark.id, 'url', e.target.value)}
+                                className="input-field text-sm"
+                                placeholder="URL"
+                              />
+                              <input
+                                type="text"
+                                value={bookmark.description || ''}
+                                onChange={(e) => updateBookmark(bookmark.id, 'description', e.target.value)}
+                                className="input-field text-sm"
+                                placeholder="Описание (опционально)"
+                              />
+                              <button
+                                onClick={() => setEditingBookmarkId(null)}
+                                className="btn btn-primary text-sm w-full"
+                              >
+                                <Check size={16} /> Готово
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-3">
+                              <div className="flex-1 min-w-0" onClick={() => setEditingBookmarkId(bookmark.id)}>
+                                <div className="font-medium text-sm truncate">{bookmark.name}</div>
+                                {bookmark.description && (
+                                  <div className="text-xs text-dark-400 truncate">{bookmark.description}</div>
+                                )}
+                                <div className="text-xs text-dark-500 truncate">{bookmark.url}</div>
+                              </div>
+                              <a
+                                href={bookmark.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-2 hover:bg-dark-700 rounded-lg text-blue-400"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ExternalLink size={16} />
+                              </a>
+                              <button
+                                onClick={() => removeBookmark(bookmark.id)}
+                                className="p-2 hover:bg-dark-700 rounded-lg text-red-400"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Добавить закладку */}
+                  <div className="p-4 bg-dark-800/50 rounded-xl border border-dashed border-dark-600">
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={newBookmark.name}
+                        onChange={(e) => setNewBookmark({...newBookmark, name: e.target.value})}
+                        className="input-field"
+                        placeholder="Название *"
+                      />
+                      <input
+                        type="url"
+                        value={newBookmark.url}
+                        onChange={(e) => setNewBookmark({...newBookmark, url: e.target.value})}
+                        className="input-field"
+                        placeholder="URL *"
+                      />
+                      <input
+                        type="text"
+                        value={newBookmark.description}
+                        onChange={(e) => setNewBookmark({...newBookmark, description: e.target.value})}
+                        className="input-field"
+                        placeholder="Описание (опционально)"
+                      />
+                      <button
+                        onClick={addBookmark}
+                        disabled={!newBookmark.name || !newBookmark.url}
+                        className="btn btn-primary w-full disabled:opacity-50"
+                      >
+                        <Plus size={18} /> Добавить закладку
+                      </button>
+                    </div>
+                  </div>
+
+                  {(formData.bookmarks || []).length === 0 && (
+                    <p className="text-center text-dark-400 text-sm py-4">
+                      Закладки позволяют хранить несколько ссылок в одной карточке
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -1240,6 +1389,146 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                   </>
                 );
               })()}
+            </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'bookmarks' && (
+            <motion.div
+              key="bookmarks"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.15 }}
+            >
+            <div className="space-y-4">
+              <p className="text-dark-400 text-sm">
+                Закладки позволяют хранить несколько ссылок в одной карточке — удобно для группировки рабочих инструментов, документации и т.д.
+              </p>
+
+              {/* Список закладок */}
+              {(formData.bookmarks || []).length > 0 && (
+                <div className="space-y-2">
+                  {(formData.bookmarks || []).map((bookmark, index) => (
+                    <div key={bookmark.id} className="p-4 bg-dark-800/50 rounded-xl border border-dark-700 group">
+                      {editingBookmarkId === bookmark.id ? (
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-sm text-dark-400 mb-1">Название *</label>
+                              <input
+                                type="text"
+                                value={bookmark.name}
+                                onChange={(e) => updateBookmark(bookmark.id, 'name', e.target.value)}
+                                className="input-field"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm text-dark-400 mb-1">URL *</label>
+                              <input
+                                type="url"
+                                value={bookmark.url}
+                                onChange={(e) => updateBookmark(bookmark.id, 'url', e.target.value)}
+                                className="input-field"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm text-dark-400 mb-1">Описание</label>
+                            <input
+                              type="text"
+                              value={bookmark.description || ''}
+                              onChange={(e) => updateBookmark(bookmark.id, 'description', e.target.value)}
+                              className="input-field"
+                              placeholder="Краткое описание (опционально)"
+                            />
+                          </div>
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => setEditingBookmarkId(null)}
+                              className="btn btn-primary text-sm"
+                            >
+                              <Check size={16} /> Готово
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+                            <Bookmark size={18} />
+                          </div>
+                          <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setEditingBookmarkId(bookmark.id)}>
+                            <div className="font-medium truncate">{bookmark.name}</div>
+                            {bookmark.description && (
+                              <div className="text-sm text-dark-400 truncate">{bookmark.description}</div>
+                            )}
+                            <div className="text-xs text-dark-500 truncate">{bookmark.url}</div>
+                          </div>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a
+                              href={bookmark.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 hover:bg-dark-700 rounded-lg text-blue-400 transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                              title="Открыть ссылку"
+                            >
+                              <ExternalLink size={18} />
+                            </a>
+                            <button
+                              onClick={() => removeBookmark(bookmark.id)}
+                              className="p-2 hover:bg-dark-700 rounded-lg text-red-400 transition-colors"
+                              title="Удалить"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Добавить закладку */}
+              <div className="p-4 bg-dark-800/30 rounded-xl border-2 border-dashed border-dark-600">
+                <h4 className="font-medium mb-3 flex items-center gap-2">
+                  <Plus size={18} className="text-blue-400" />
+                  Добавить закладку
+                </h4>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <input
+                    type="text"
+                    value={newBookmark.name}
+                    onChange={(e) => setNewBookmark({...newBookmark, name: e.target.value})}
+                    className="input-field"
+                    placeholder="Название *"
+                  />
+                  <input
+                    type="url"
+                    value={newBookmark.url}
+                    onChange={(e) => setNewBookmark({...newBookmark, url: e.target.value})}
+                    className="input-field"
+                    placeholder="URL *"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={newBookmark.description}
+                    onChange={(e) => setNewBookmark({...newBookmark, description: e.target.value})}
+                    className="input-field flex-1"
+                    placeholder="Описание (опционально)"
+                  />
+                  <button
+                    onClick={addBookmark}
+                    disabled={!newBookmark.name || !newBookmark.url}
+                    className="btn btn-primary px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Plus size={18} /> Добавить
+                  </button>
+                </div>
+              </div>
             </div>
             </motion.div>
           )}

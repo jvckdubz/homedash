@@ -1,10 +1,19 @@
 # Changelog
 
+## [1.1.5] - 2025-01-24
+
+### Added
+- Bookmarks feature - store multiple links in a single card
+- New "Bookmarks" tab in card editor
+- Bookmarks counter on card preview
+- Bookmarks list in card detail view (desktop & mobile)
+- Quick access to bookmark links with one tap
+
 ## [1.1.4] - 2025-01-24
 
 ### Added
 - "Sticker" style for custom icons - unified look with shadow and glassmorphism
-- Custom icons now properly displayed in card detail view (was showing old icon)
+- Custom icons now properly displayed in card detail view
 
 ### Fixed
 - Custom icon not showing when opening card detail modal
@@ -16,10 +25,6 @@
 - Font Awesome 6.5 integration (100+ icons)
 - Icon picker with Lucide/Font Awesome tabs in payments
 - Brand icons: Spotify, Netflix, YouTube, Telegram, Discord, Steam, etc.
-- Category icons: utilities, transport, health, finance, etc.
-
-### Changed
-- Improved icon URL input styling (matches project design)
 
 ## [1.1.2] - 2025-01-23
 
@@ -27,15 +32,10 @@
 - Custom icon URL field - use icons from any external source
 - Links to popular icon sources (SimpleIcons, Dashboard Icons, Selfh.st)
 
-### Changed
-- Icon selection UI improved with URL input field
-- "Fetch favicon" button only shows when no custom URL is set
-
 ## [1.1.1] - 2025-01-23
 
 ### Added
-- Daily Telegram report with payments, tasks, services status, and update notifications
-- Test button for daily report sends real data
+- Daily Telegram report with payments, tasks, services status
 
 ### Fixed
 - Docker image path in update commands (ghcr.io/jvckdubz/homedash)
@@ -45,22 +45,15 @@
 
 ### Added
 - Update checker with GitHub integration
-- Automatic detection of deployment method
-- Dynamic update commands based on deployment type
 - Expanded icon library (30+ new icons)
 
 ### Fixed
-- Note deletion modal now closes automatically
-- Double confirmation dialogs on mobile card deletion
+- Note deletion modal, double confirmation dialogs
 
 ## [1.0.0] - Initial Release
 
 ### Features
-- Service monitoring with health checks
-- Docker and Portainer integration
-- Payment and subscription tracking
-- Task and note management
-- Telegram notifications
-- Multi-language support (RU/EN)
-- PWA support
-- Dark theme
+- Service monitoring, Docker/Portainer integration
+- Payment tracking, Tasks, Notes
+- Telegram notifications, Weather widget
+- Multi-language (RU/EN), PWA, Dark theme

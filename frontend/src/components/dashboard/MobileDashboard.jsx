@@ -5,7 +5,8 @@ import {
   Wrench, Home, Shield, Globe, Cpu, HardDrive, Clock as ClockIcon, RefreshCw,
   ChevronDown, ChevronUp, Receipt, CheckCircle2, Search, Link2, AlertCircle, Zap,
   ArrowLeft, Container, Droplets, FileText, Gauge, Grid, Layers, Lightbulb, Lock,
-  Network, PauseCircle, PlayCircle, Power, Radio, Router, ThermometerSun, Users, Wind
+  Network, PauseCircle, PlayCircle, Power, Radio, Router, ThermometerSun, Users, Wind,
+  Bookmark
 } from 'lucide-react';
 import api from '../../api';
 import { translations } from '../../constants/translations';
@@ -228,6 +229,13 @@ function MobileDashboard({
             </div>
             {card.description && (
               <p className="text-sm text-white/50 truncate">{card.description}</p>
+            )}
+            {/* Bookmarks indicator */}
+            {card.bookmarks?.length > 0 && (
+              <div className="flex items-center gap-1 mt-1 text-xs text-blue-400">
+                <Bookmark size={12} />
+                <span>{card.bookmarks.length} {card.bookmarks.length === 1 ? 'ссылка' : card.bookmarks.length < 5 ? 'ссылки' : 'ссылок'}</span>
+              </div>
             )}
             {/* Integration data preview */}
             {integrationPreview && (
@@ -1073,6 +1081,39 @@ function MobileDashboard({
                   </div>
                 )}
               </div>
+
+              {/* Bookmarks Section */}
+              {selectedCard.bookmarks?.length > 0 && (
+                <div className="px-4 pb-4 border-b border-white/10">
+                  <h4 className="text-sm font-medium text-white/50 mb-3 flex items-center gap-2">
+                    <Bookmark size={14} />
+                    Закладки ({selectedCard.bookmarks.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedCard.bookmarks.map(bookmark => (
+                      <a
+                        key={bookmark.id}
+                        href={bookmark.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 bg-white/5 active:bg-white/10 rounded-xl transition-colors"
+                        onClick={() => setSelectedCard(null)}
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+                          <Bookmark size={16} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-white text-sm truncate">{bookmark.name}</div>
+                          {bookmark.description && (
+                            <div className="text-xs text-white/40 truncate">{bookmark.description}</div>
+                          )}
+                        </div>
+                        <ExternalLink size={16} className="text-white/30 flex-shrink-0" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="p-2">

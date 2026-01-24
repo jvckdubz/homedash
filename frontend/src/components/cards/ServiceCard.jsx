@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
-  Edit3, Trash2, ExternalLink, Server, GripVertical, Link2, Receipt, Clock as ClockIcon
+  Edit3, Trash2, ExternalLink, Server, GripVertical, Link2, Receipt, Clock as ClockIcon, Bookmark
 } from 'lucide-react';
 import { serviceIcons } from '../../constants/icons';
 import { IntegrationStats } from '../common';
@@ -155,6 +155,13 @@ function ServiceCard({ card, onEdit, onDelete, integrationData, onShowDetail, mo
               <div className="flex-1 min-w-0 overflow-hidden">
                 <h3 className="font-semibold text-white truncate text-sm">{card.name}</h3>
                 <p className="text-xs text-dark-400 truncate">{card.description}</p>
+                {/* Количество закладок */}
+                {card.bookmarks?.length > 0 && (
+                  <div className="flex items-center gap-1 mt-1 text-xs text-blue-400">
+                    <Bookmark size={12} />
+                    <span>{card.bookmarks.length} {card.bookmarks.length === 1 ? 'ссылка' : card.bookmarks.length < 5 ? 'ссылки' : 'ссылок'}</span>
+                  </div>
+                )}
               </div>
             </div>
             

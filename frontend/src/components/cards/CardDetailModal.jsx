@@ -4,7 +4,7 @@ import {
   X, ExternalLink, Cpu, HardDrive, Server, Container, Shield, Globe,
   Lightbulb, ToggleRight, Gauge, PlayCircle, PauseCircle, Layers, 
   Clock as ClockIcon, Activity, Database, FileJson, RefreshCw, Network,
-  Settings, Users, Zap, AlertCircle, ThermometerSun, Droplets, Wind
+  Settings, Users, Zap, AlertCircle, ThermometerSun, Droplets, Wind, Bookmark
 } from 'lucide-react';
 import { serviceIcons } from '../../constants/icons';
 
@@ -780,6 +780,40 @@ function CardDetailModal({ card, data, onClose }) {
             <div className="text-center py-8">
               <Settings size={48} className="text-dark-500 mx-auto mb-4" />
               <p className="text-dark-400">Интеграция не настроена</p>
+            </div>
+          )}
+
+          {/* Bookmarks Section */}
+          {card.bookmarks?.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-dark-700">
+              <h3 className="text-sm font-medium text-dark-400 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <Bookmark size={16} />
+                Закладки ({card.bookmarks.length})
+              </h3>
+              <div className="space-y-2">
+                {card.bookmarks.map(bookmark => (
+                  <a
+                    key={bookmark.id}
+                    href={bookmark.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 bg-dark-800/50 hover:bg-dark-700/50 rounded-xl transition-colors group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+                      <Bookmark size={18} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white group-hover:text-blue-400 transition-colors truncate">
+                        {bookmark.name}
+                      </div>
+                      {bookmark.description && (
+                        <div className="text-sm text-dark-400 truncate">{bookmark.description}</div>
+                      )}
+                    </div>
+                    <ExternalLink size={16} className="text-dark-500 group-hover:text-blue-400 transition-colors flex-shrink-0" />
+                  </a>
+                ))}
+              </div>
             </div>
           )}
 
