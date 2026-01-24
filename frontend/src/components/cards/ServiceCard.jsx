@@ -37,9 +37,10 @@ function ServiceCard({ card, onEdit, onDelete, integrationData, onShowDetail, mo
     // Собираем все данные для модалки
     const hasIntegration = card.integration?.type && integrationData;
     const hasMonitoring = isMonitoringEnabled && monitoringStatus;
+    const hasBookmarks = card.bookmarks?.length > 0;
     
     // Если есть что показать - открываем модалку
-    if (hasIntegration || hasMonitoring || hasBilling) {
+    if (hasIntegration || hasMonitoring || hasBilling || hasBookmarks) {
       onShowDetail(card, {
         ...(integrationData || {}),
         monitoringStatus: hasMonitoring ? monitoringStatus : null,
