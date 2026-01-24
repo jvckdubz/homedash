@@ -20,33 +20,6 @@
 <img width="1918" height="905" alt="image" src="https://github.com/user-attachments/assets/9ca5c919-a17c-455e-9a80-c6382f7a0ee6" />
 <img width="1910" height="904" alt="image" src="https://github.com/user-attachments/assets/442e432c-766c-44d9-b2ef-a3809715bf69" />
 
-**PWA:**
-
-![photo_1_2026-01-24_18-05-26](https://github.com/user-attachments/assets/0ced20a1-6362-4ffe-9410-294f094ffe33)
-![photo_2_2026-01-24_18-05-26](https://github.com/user-attachments/assets/6a29b87a-5a9e-4dea-b6b6-b9010ea91e3f)
-![photo_3_2026-01-24_18-05-26](https://github.com/user-attachments/assets/9d444e3f-4da7-4837-8571-1a7f7d90afd5)
-![photo_4_2026-01-24_18-05-26](https://github.com/user-attachments/assets/3855f65f-dd7f-476c-a103-de895aa1f8be)
-![photo_5_2026-01-24_18-05-26](https://github.com/user-attachments/assets/5b76fc95-33c1-4402-b342-49272035f520)
-![photo_6_2026-01-24_18-05-26](https://github.com/user-attachments/assets/e8f4ea55-12cc-4cac-bf04-01ba384a58e2)
-![photo_7_2026-01-24_18-05-26](https://github.com/user-attachments/assets/988f884f-eb4e-42fc-b541-2680ed180fb8)
-![photo_8_2026-01-24_18-05-26](https://github.com/user-attachments/assets/7a9fe387-21c6-4b6e-ae0a-ff20c4a0da2e)
-![photo_9_2026-01-24_18-05-26](https://github.com/user-attachments/assets/b8929ce0-1226-454f-b0bd-27353020f725)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </details>
 
@@ -197,17 +170,6 @@ Self-hosted dashboard for monitoring services and managing home infrastructure.
 <img width="1918" height="905" alt="image" src="https://github.com/user-attachments/assets/9ca5c919-a17c-455e-9a80-c6382f7a0ee6" />
 <img width="1910" height="904" alt="image" src="https://github.com/user-attachments/assets/442e432c-766c-44d9-b2ef-a3809715bf69" />
 
-**PWA:**
-
-![photo_1_2026-01-24_18-05-26](https://github.com/user-attachments/assets/0ced20a1-6362-4ffe-9410-294f094ffe33)
-![photo_2_2026-01-24_18-05-26](https://github.com/user-attachments/assets/6a29b87a-5a9e-4dea-b6b6-b9010ea91e3f)
-![photo_3_2026-01-24_18-05-26](https://github.com/user-attachments/assets/9d444e3f-4da7-4837-8571-1a7f7d90afd5)
-![photo_4_2026-01-24_18-05-26](https://github.com/user-attachments/assets/3855f65f-dd7f-476c-a103-de895aa1f8be)
-![photo_5_2026-01-24_18-05-26](https://github.com/user-attachments/assets/5b76fc95-33c1-4402-b342-49272035f520)
-![photo_6_2026-01-24_18-05-26](https://github.com/user-attachments/assets/e8f4ea55-12cc-4cac-bf04-01ba384a58e2)
-![photo_7_2026-01-24_18-05-26](https://github.com/user-attachments/assets/988f884f-eb4e-42fc-b541-2680ed180fb8)
-![photo_8_2026-01-24_18-05-26](https://github.com/user-attachments/assets/7a9fe387-21c6-4b6e-ae0a-ff20c4a0da2e)
-![photo_9_2026-01-24_18-05-26](https://github.com/user-attachments/assets/b8929ce0-1226-454f-b0bd-27353020f725)
 
 </details>
 
