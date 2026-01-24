@@ -139,16 +139,18 @@ function ServiceCard({ card, onEdit, onDelete, integrationData, onShowDetail, mo
           <div className="p-4">
             {/* Header: Icon + Name/Description */}
             <div className="flex items-start gap-3">
-              <div 
-                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: `${card.color}20`, color: card.color }}
-              >
-                {card.customIcon ? (
-                  <img src={card.customIcon} alt="" className="w-7 h-7 object-contain" />
-                ) : (
+              {card.customIcon ? (
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/10 backdrop-blur-sm shadow-lg ring-1 ring-white/10">
+                  <img src={card.customIcon} alt="" className="w-7 h-7 object-contain drop-shadow" />
+                </div>
+              ) : (
+                <div 
+                  className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
+                  style={{ backgroundColor: `${card.color}25`, color: card.color }}
+                >
                   <div className="w-6 h-6"><IconComponent /></div>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="flex-1 min-w-0 overflow-hidden">
                 <h3 className="font-semibold text-white truncate text-sm">{card.name}</h3>

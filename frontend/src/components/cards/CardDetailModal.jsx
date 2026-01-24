@@ -47,10 +47,16 @@ function CardDetailModal({ card, data, onClose }) {
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: `${card.color}20`, color: card.color }}>
-                <div className="w-10 h-10"><IconComponent /></div>
-              </div>
+              {card.customIcon ? (
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/10">
+                  <img src={card.customIcon} alt="" className="w-10 h-10 object-contain drop-shadow-md" />
+                </div>
+              ) : (
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl"
+                  style={{ backgroundColor: `${card.color}25`, color: card.color }}>
+                  <div className="w-10 h-10"><IconComponent /></div>
+                </div>
+              )}
               <div>
                 <h2 className="text-2xl font-semibold text-white">{card.name}</h2>
                 <p className="text-dark-400">{card.description}</p>

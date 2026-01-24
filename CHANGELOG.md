@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.4] - 2025-01-24
+
+### Added
+- "Sticker" style for custom icons - unified look with shadow and glassmorphism
+- Custom icons now properly displayed in card detail view (was showing old icon)
+
+### Fixed
+- Custom icon not showing when opening card detail modal
+- Icon containers now have consistent styling across all views
+
 ## [1.1.3] - 2025-01-24
 
 ### Added
@@ -35,19 +45,13 @@
 
 ### Added
 - Update checker with GitHub integration
-- Update notifications in settings
-- Automatic detection of deployment method (Docker Compose / Docker Run)
+- Automatic detection of deployment method
 - Dynamic update commands based on deployment type
 - Expanded icon library (30+ new icons)
-
-### Changed
-- Improved mobile UI for payment management
-- Simplified System settings tab
 
 ### Fixed
 - Note deletion modal now closes automatically
 - Double confirmation dialogs on mobile card deletion
-- Various mobile interface issues
 
 ## [1.0.0] - Initial Release
 
@@ -56,7 +60,6 @@
 - Docker and Portainer integration
 - Payment and subscription tracking
 - Task and note management
-- Weather widget
 - Telegram notifications
 - Multi-language support (RU/EN)
 - PWA support

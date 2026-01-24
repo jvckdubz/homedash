@@ -205,16 +205,18 @@ function MobileDashboard({
       >
         <div className="flex items-center gap-3">
           {/* Icon */}
-          <div 
-            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: `${card.color}20`, color: card.color }}
-          >
-            {card.customIcon ? (
-              <img src={card.customIcon} alt="" className="w-7 h-7 object-contain" />
-            ) : (
+          {card.customIcon ? (
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-white/10 backdrop-blur-sm shadow-lg ring-1 ring-white/10">
+              <img src={card.customIcon} alt="" className="w-7 h-7 object-contain drop-shadow" />
+            </div>
+          ) : (
+            <div 
+              className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
+              style={{ backgroundColor: `${card.color}25`, color: card.color }}
+            >
               <IconComp className="w-6 h-6" />
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Info */}
           <div className="flex-1 min-w-0">
@@ -870,16 +872,18 @@ function MobileDashboard({
               {/* Card Preview */}
               <div className="p-4 border-b border-white/10">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: `${selectedCard.color || '#666'}20`, color: selectedCard.color || '#666' }}
-                  >
-                    {selectedCard.customIcon ? (
-                      <img src={selectedCard.customIcon} alt="" className="w-8 h-8 object-contain" />
-                    ) : (
-                      React.createElement(serviceIcons[selectedCard.icon] || Server, { className: 'w-7 h-7' })
-                    )}
-                  </div>
+                  {selectedCard.customIcon ? (
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-white/10 backdrop-blur-sm shadow-lg ring-1 ring-white/10">
+                      <img src={selectedCard.customIcon} alt="" className="w-8 h-8 object-contain drop-shadow" />
+                    </div>
+                  ) : (
+                    <div 
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
+                      style={{ backgroundColor: `${selectedCard.color || '#666'}25`, color: selectedCard.color || '#666' }}
+                    >
+                      {React.createElement(serviceIcons[selectedCard.icon] || Server, { className: 'w-7 h-7' })}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-lg">{selectedCard.name || 'Unknown'}</h3>
                     {selectedCard.description && (
