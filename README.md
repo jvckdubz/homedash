@@ -9,9 +9,12 @@
 <details>
 <summary>📸 Скриншоты</summary>
 
-![Dashboard](screenshots/dashboard.png)
-![Mobile](screenshots/mobile.png)
-![Payments](screenshots/payments.png)
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/a6001c23-a5ab-4adc-ab2e-685278610109" />
+<img width="946" height="264" alt="image" src="https://github.com/user-attachments/assets/5e5779b4-c805-4a5e-b51f-3c5779453422" />
+<img width="671" height="796" alt="image" src="https://github.com/user-attachments/assets/c388157c-4c02-4ae9-903c-c5cad6361c61" />
+
+
+
 
 </details>
 
