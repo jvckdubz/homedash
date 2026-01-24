@@ -10,7 +10,8 @@
 <summary>📸 Скриншоты</summary>
 
 <img width="1912" height="906" alt="image" src="https://github.com/user-attachments/assets/3a4cd51e-7467-4479-9903-213165960a89" />
-<img width="1903" height="713" alt="image" src="https://github.com/user-attachments/assets/f61dc81e-4df3-4dcc-8c88-5a9c71e29927" />
+<img width="1902" height="515" alt="image" src="https://github.com/user-attachments/assets/e2447d08-0cc9-4a9d-9b69-ba36fe84882a" />
+
 <img width="1903" height="759" alt="image" src="https://github.com/user-attachments/assets/de37d1de-79e8-4f02-8eca-ccb9c91022f4" />
 <img width="1911" height="754" alt="image" src="https://github.com/user-attachments/assets/0908c8ac-97da-400a-bdab-3725b669c681" />
 
