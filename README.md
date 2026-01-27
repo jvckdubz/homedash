@@ -37,6 +37,21 @@
 - Время отклика
 - Telegram-уведомления при падении/восстановлении сервисов
 
+#### Публичная страница статуса
+- Страница статуса для внешних пользователей (`/status`)
+- Настраиваемый заголовок, описание и логотип
+- Выбор сервисов для публичного отображения
+- Обновление статуса в реальном времени с визуализацией heartbeat
+- Адаптивный дизайн для мобильных устройств
+- Поддержка нескольких языков
+
+#### Push-уведомления (PWA)
+- Получение уведомлений даже при закрытом приложении
+- Автоматическая генерация VAPID ключей
+- Service Worker для фоновых уведомлений
+- Оповещения мониторинга (сервис доступен/недоступен)
+- Управление устройствами в настройках
+
 ### 🔌 Интеграции
 
 | Сервис | Данные |
@@ -186,6 +201,21 @@ Self-hosted dashboard for monitoring services and managing home infrastructure.
 - Uptime statistics for 24h / 7 days
 - Response time tracking
 - Telegram notifications on status changes
+
+#### Public Status Page
+- Shareable status page for external users (`/status`)
+- Customizable title, description and logo
+- Select which services to display publicly
+- Real-time status updates with heartbeat visualization
+- Mobile-responsive design
+- Multi-language support
+
+#### PWA Push Notifications
+- Receive alerts even when the app is closed
+- Automatic VAPID key generation
+- Service Worker for background notifications
+- Monitoring alerts (service up/down)
+- Device management in settings
 
 ### 🔌 Integrations
 
