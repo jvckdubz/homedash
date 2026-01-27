@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.5.0] - 2025-01-27
+
+### Added
+- **Public Status Page** - shareable page showing service status for external users
+  - Customizable title, description and logo
+  - Select which services to display publicly
+  - Real-time status updates with heartbeat visualization
+  - Mobile-responsive design
+  - Multi-language support (RU/EN)
+  - Accessible via `/status` route
+- **PWA Push Notifications** - receive alerts even when app is closed
+  - VAPID key auto-generation
+  - Service Worker for background notifications
+  - Monitoring alerts (service up/down)
+  - Device management in settings
+  - Works on desktop and mobile browsers
+- New logo design (Home + Pulse gradient)
+- Improved heartbeat bars visualization across all views
+- Mobile dashboard integration improvements (NPM, Home Assistant, WikiJS)
+
+### Fixed
+- Heartbeat bars now fill container width properly
+- Mobile status tab displays correct response times
+- Integration data display in mobile detail views
+
 ## [1.1.5] - 2025-01-24
 
 ### Added

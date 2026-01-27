@@ -15,7 +15,7 @@ import {
   rectSortingStrategy
 } from '@dnd-kit/sortable';
 import {
-  Settings, Plus, Grid, RefreshCw, ChevronDown, Download, Receipt,
+  Settings, Plus, RefreshCw, ChevronDown, Download, Receipt,
   Globe, CheckCircle2, Server, Home, Activity, AlertCircle
 } from 'lucide-react';
 
@@ -151,16 +151,7 @@ export default function App() {
   // Service Worker registration and update handling
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      // Skip SW on HTTPS with self-signed cert (will fail anyway)
-      const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-      const isHttp = location.protocol === 'http:';
-      
-      if (!isLocalhost && !isHttp) {
-        // HTTPS with IP/domain - likely self-signed, skip SW
-        return;
-      }
-      
-      // Регистрируем SW
+      // Регистрируем SW везде где возможно (для PWA и Push)
       navigator.serviceWorker.register('/sw.js')
         .then(registration => {
           console.log('[App] SW registered');
@@ -170,8 +161,9 @@ export default function App() {
             registration.update().catch(() => {});
           }, 5 * 60 * 1000);
         })
-        .catch(() => {
-          // Silently ignore - app works without SW
+        .catch((err) => {
+          // SW может не работать на HTTPS с self-signed cert без установки
+          console.log('[App] SW registration failed:', err.message);
         });
     }
 
@@ -733,8 +725,13 @@ export default function App() {
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-dark-900/50 border-b border-dark-800">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-              <Grid size={20} /></div>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 10.5L12 3l9 7.5"/>
+                <path d="M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9"/>
+                <polyline points="8 15 10 15 11 12 13 18 14 15 16 15" strokeWidth="1.5"/>
+              </svg>
+            </div>
             <h1 className="text-xl font-semibold">{settings.title}</h1>
           </div>
           <div className="flex items-center gap-2">

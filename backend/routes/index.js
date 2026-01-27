@@ -14,5 +14,7 @@ module.exports = {
   weather: require('./weather'),
   ssh: require('./ssh'),
   notifications: require('./notifications'),
-  discover: require('./discover')
+  discover: require('./discover'),
+  statusPage: require('./statusPage'),
+  push: require('./push')
 };

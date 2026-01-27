@@ -15,6 +15,7 @@ import IntegrationTemplateEditor from './IntegrationTemplateEditor';
 import SystemInfoSection from './SystemInfoSection';
 import NotificationsSettings from './NotificationsSettings';
 import MonitoringSettings from './MonitoringSettings';
+import StatusPageSettings from './StatusPageSettings';
 
 function SettingsModal({ settings, categories, integrationTemplates, onSave, onClose, onExport, onImport, onCategoryChange, onTemplateChange, saveStatus, lang }) {
   // Local translation function
@@ -170,6 +171,7 @@ function SettingsModal({ settings, categories, integrationTemplates, onSave, onC
     {id:'general', label: t('general'), icon: Settings},
     {id:'notifications', label: t('notifications'), icon: Bell},
     {id:'monitoring', label: t('monitoring'), icon: Activity},
+    {id:'statusPage', label: 'Страница статуса', icon: Globe},
     {id:'categories', label: t('categories'), icon: Folder},
     {id:'integrations', label: t('integrations'), icon: Zap},
     {id:'ssh', label: t('sshKeys'), icon: Key},
@@ -416,6 +418,10 @@ function SettingsModal({ settings, categories, integrationTemplates, onSave, onC
                 {activeTab === 'system' && (
                   <SystemInfoSection />
                 )}
+
+                {activeTab === 'statusPage' && (
+                  <StatusPageSettings />
+                )}
               </div>
             )}
             </div>
@@ -578,6 +584,18 @@ function SettingsModal({ settings, categories, integrationTemplates, onSave, onC
                 transition={{ duration: 0.15 }}
               >
               <MonitoringSettings formData={formData} setFormData={setFormData} />
+              </motion.div>
+            )}
+
+            {activeTab === 'statusPage' && (
+              <motion.div
+                key="statusPage"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.15 }}
+              >
+              <StatusPageSettings />
               </motion.div>
             )}
 

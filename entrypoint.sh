@@ -1,7 +1,48 @@
 #!/bin/sh
 
 # Create directories if not exist
-mkdir -p /app/data/icons /app/data/ssh_keys /app/data/ssl
+mkdir -p /app/data/icons /app/data/ssh_keys /app/data/ssl /app/data/pwa
+
+# Generate PWA icons if not exist or if favicon.svg is newer
+REGEN_ICONS=false
+if [ ! -f /app/data/pwa/apple-touch-icon.png ]; then
+    REGEN_ICONS=true
+    echo "[PWA] Icons not found, will generate"
+elif [ /app/public/favicon.svg -nt /app/data/pwa/apple-touch-icon.png ]; then
+    REGEN_ICONS=true
+    echo "[PWA] favicon.svg updated, will regenerate icons"
+fi
+
+if [ "$REGEN_ICONS" = true ]; then
+    echo "[PWA] Generating app icons to /app/data/pwa/..."
+    
+    if command -v magick > /dev/null 2>&1; then
+        # ImageMagick 7 - 8-bit PNG with solid background (required for iOS)
+        magick /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 180x180 /app/data/pwa/apple-touch-icon.png 2>/dev/null
+        magick /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 152x152 /app/data/pwa/apple-touch-icon-152.png 2>/dev/null
+        magick /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 120x120 /app/data/pwa/apple-touch-icon-120.png 2>/dev/null
+        magick /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 192x192 /app/data/pwa/icon-192.png 2>/dev/null
+        magick /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 512x512 /app/data/pwa/icon-512.png 2>/dev/null
+        echo "[PWA] Icons generated with ImageMagick 7 (8-bit sRGB)"
+    elif command -v convert > /dev/null 2>&1; then
+        # ImageMagick 6
+        convert /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 180x180 /app/data/pwa/apple-touch-icon.png 2>/dev/null
+        convert /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 152x152 /app/data/pwa/apple-touch-icon-152.png 2>/dev/null
+        convert /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 120x120 /app/data/pwa/apple-touch-icon-120.png 2>/dev/null
+        convert /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 192x192 /app/data/pwa/icon-192.png 2>/dev/null
+        convert /app/public/favicon.svg -background "#0d0d0f" -flatten -depth 8 -resize 512x512 /app/data/pwa/icon-512.png 2>/dev/null
+        echo "[PWA] Icons generated with ImageMagick 6 (8-bit sRGB)"
+    else
+        echo "[PWA] WARNING: ImageMagick not found, PWA icons not generated"
+    fi
+    
+    # Verify
+    if [ -f /app/data/pwa/apple-touch-icon.png ]; then
+        ls -la /app/data/pwa/
+    fi
+else
+    echo "[PWA] Icons already exist in /app/data/pwa/"
+fi
 
 # Generate SSL certificate if not exists
 if [ ! -f /app/data/ssl/server.key ] || [ ! -f /app/data/ssl/server.crt ]; then

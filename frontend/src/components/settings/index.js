@@ -5,3 +5,4 @@ export { default as IntegrationTemplateEditor } from './IntegrationTemplateEdito
 export { default as SystemInfoSection } from './SystemInfoSection';
 export { default as NotificationsSettings } from './NotificationsSettings';
 export { default as MonitoringSettings } from './MonitoringSettings';
+export { default as StatusPageSettings } from './StatusPageSettings';

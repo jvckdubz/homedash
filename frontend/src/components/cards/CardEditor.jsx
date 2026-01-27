@@ -5,7 +5,7 @@ import {
   Check, AlertCircle, Eye, EyeOff, RefreshCw, ChevronDown, ChevronUp,
   Bell, Key, Upload, Clock as ClockIcon, Zap, FileText,
   Palette, ArrowLeft, CheckCircle2, Wifi, Trash2, Radio, Signal,
-  Bookmark, Plus, ExternalLink, GripVertical
+  Bookmark, Plus, ExternalLink, GripVertical, Bug
 } from 'lucide-react';
 import api from '../../api';
 import { translations } from '../../constants/translations';
@@ -38,6 +38,16 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
   const [sshKeys, setSshKeys] = useState([]);
   const [hostKeys, setHostKeys] = useState({ found: false, keys: [] });
   const [deletingKeys, setDeletingKeys] = useState(false);
+  
+  // Debug mode state
+  const [debugMode, setDebugMode] = useState(() => localStorage.getItem('homedash-debug') === 'true');
+  
+  // Listen for debug mode changes
+  useEffect(() => {
+    const handleDebugChange = (e) => setDebugMode(e.detail);
+    window.addEventListener('homedash-debug-change', handleDebugChange);
+    return () => window.removeEventListener('homedash-debug-change', handleDebugChange);
+  }, []);
   
   // Discovery state
   const [isDiscovering, setIsDiscovering] = useState(false);
@@ -1326,7 +1336,9 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                   <div>
                     <div className="font-medium">Мониторинг доступности</div>
                     <div className="text-sm text-dark-400">
-                      {formData.monitoring?.enabled ? 'Проверка каждые 60 сек' : 'Отключён'}
+                      {formData.monitoring?.enabled 
+                        ? `Проверка каждые ${formData.monitoring?.interval || 60} сек` 
+                        : 'Отключён'}
                     </div>
                   </div>
                 </div>
@@ -1340,8 +1352,16 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
               {(() => {
                 const hasUrl = Boolean(formData.url);
                 const hasSSH = formData.integration?.type === 'ssh' && formData.integration?.host;
-                const hasTarget = hasUrl || hasSSH;
+                const hasTCP = formData.monitoring?.type === 'tcp' && formData.monitoring?.host;
+                const hasTarget = hasUrl || hasSSH || hasTCP;
                 const isSSH = formData.integration?.type === 'ssh';
+
+                const updateMonitoring = (key, value) => {
+                  setFormData({
+                    ...formData, 
+                    monitoring: {...formData.monitoring, [key]: value}
+                  });
+                };
 
                 return (
                   <>
@@ -1359,12 +1379,151 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                     )}
 
                     {formData.monitoring?.enabled && hasTarget && (
-                      <div className="space-y-3">
-                        <div className="p-4 bg-dark-800/50 rounded-xl">
-                          <div className="flex items-center gap-2 text-dark-400 text-sm mb-3">
-                            <Bell size={14} />
-                            <span>Уведомления настраиваются глобально в Настройках → Мониторинг</span>
+                      <div className="space-y-4">
+                        {/* Индивидуальные настройки */}
+                        <div className="p-4 bg-dark-800/50 rounded-xl space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-dark-300">Индивидуальные настройки</span>
+                            <label className="flex items-center gap-2 text-sm text-dark-400">
+                              <input
+                                type="checkbox"
+                                className="rounded border-dark-600 bg-dark-700 text-blue-500"
+                                checked={formData.monitoring?.useCustomSettings || false}
+                                onChange={(e) => updateMonitoring('useCustomSettings', e.target.checked)}
+                              />
+                              Переопределить глобальные
+                            </label>
                           </div>
+
+                          {formData.monitoring?.useCustomSettings && (
+                            <div className="space-y-4 pt-3 border-t border-dark-700">
+                              {/* Интервалы */}
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm text-dark-400 mb-2">
+                                    Интервал проверки (сек)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    className="input-field"
+                                    value={formData.monitoring?.interval || 60}
+                                    onChange={e => updateMonitoring('interval', parseInt(e.target.value) || 60)}
+                                    min={20}
+                                    max={86400}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm text-dark-400 mb-2">
+                                    Интервал повтора (сек)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    className="input-field"
+                                    value={formData.monitoring?.retryInterval || formData.monitoring?.interval || 60}
+                                    onChange={e => updateMonitoring('retryInterval', parseInt(e.target.value) || 60)}
+                                    min={20}
+                                    max={86400}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Timeout и Retries */}
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm text-dark-400 mb-2">
+                                    Таймаут (сек)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    className="input-field"
+                                    value={formData.monitoring?.timeout || 10}
+                                    onChange={e => updateMonitoring('timeout', parseInt(e.target.value) || 10)}
+                                    min={5}
+                                    max={120}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm text-dark-400 mb-2">
+                                    Попыток до DOWN
+                                  </label>
+                                  <input
+                                    type="number"
+                                    className="input-field"
+                                    value={formData.monitoring?.maxretries ?? 3}
+                                    onChange={e => updateMonitoring('maxretries', parseInt(e.target.value) || 0)}
+                                    min={0}
+                                    max={10}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* HTTP настройки (если есть URL) */}
+                              {hasUrl && (
+                                <>
+                                  <div className="pt-3 border-t border-dark-700">
+                                    <span className="text-sm font-medium text-dark-400">HTTP настройки</span>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="block text-sm text-dark-400 mb-2">
+                                        Метод
+                                      </label>
+                                      <select
+                                        className="input-field"
+                                        value={formData.monitoring?.method || 'GET'}
+                                        onChange={e => updateMonitoring('method', e.target.value)}
+                                      >
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                        <option value="PUT">PUT</option>
+                                        <option value="HEAD">HEAD</option>
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm text-dark-400 mb-2">
+                                        Допустимые коды
+                                      </label>
+                                      <input
+                                        type="text"
+                                        className="input-field"
+                                        value={(formData.monitoring?.acceptedStatusCodes || ['200-299']).join(', ')}
+                                        onChange={e => updateMonitoring('acceptedStatusCodes', e.target.value.split(',').map(s => s.trim()))}
+                                        placeholder="200-299, 301, 302"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm text-dark-400 mb-2">
+                                      Искать ключевое слово
+                                    </label>
+                                    <input
+                                      type="text"
+                                      className="input-field"
+                                      value={formData.monitoring?.keyword || ''}
+                                      onChange={e => updateMonitoring('keyword', e.target.value)}
+                                      placeholder="Слово которое должно быть на странице"
+                                    />
+                                  </div>
+
+                                  <label className="flex items-center gap-2 text-sm text-dark-400">
+                                    <input
+                                      type="checkbox"
+                                      className="rounded border-dark-600 bg-dark-700 text-blue-500"
+                                      checked={formData.monitoring?.invertKeyword || false}
+                                      onChange={(e) => updateMonitoring('invertKeyword', e.target.checked)}
+                                    />
+                                    Инвертировать (слово НЕ должно быть на странице)
+                                  </label>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Информация */}
+                        <div className="p-4 bg-dark-800/30 rounded-xl">
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div className="flex items-center gap-2">
                               <Check size={14} className="text-green-400" />
@@ -1372,11 +1531,11 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                             </div>
                             <div className="flex items-center gap-2">
                               <Check size={14} className="text-green-400" />
-                              <span>История 7 дней</span>
+                              <span>История и статистика</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Check size={14} className="text-green-400" />
-                              <span>Статистика uptime</span>
+                              <span>PENDING -{'>'} DOWN логика</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Check size={14} className="text-green-400" />
@@ -1384,6 +1543,25 @@ function CardEditor({ card, categories, integrationTemplates, onSave, onClose, s
                             </div>
                           </div>
                         </div>
+
+                        {/* Отладка - имитация недоступности */}
+                        {debugMode && (
+                          <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Bug size={16} className="text-orange-400" />
+                                <div>
+                                  <div className="text-sm font-medium text-orange-300">Имитировать недоступность</div>
+                                  <div className="text-xs text-orange-400/70">Сервис будет показан как DOWN для тестирования</div>
+                                </div>
+                              </div>
+                              <Toggle
+                                checked={formData.monitoring?.simulateDown || false}
+                                onChange={(v) => updateMonitoring('simulateDown', v)}
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </>

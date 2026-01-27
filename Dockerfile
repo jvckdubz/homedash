@@ -1,11 +1,14 @@
 # Build stage for frontend
 FROM node:20-alpine AS frontend-builder
 
+# Force rebuild - change this value to invalidate cache
+ARG CACHE_BUST=v1.5.0
+
 WORKDIR /build/frontend
 COPY frontend/package*.json ./
 RUN npm install --legacy-peer-deps
 COPY frontend/ ./
-RUN npm run build
+RUN echo "Build timestamp: $CACHE_BUST" && npm run build
 
 # Production stage
 FROM node:20-alpine
@@ -21,6 +24,9 @@ RUN npm install --omit=dev && npm cache clean --force
 
 # Remove build dependencies to reduce image size (keep openssl)
 RUN apk del python3 make g++
+
+# Install imagemagick with SVG support for PWA icon generation  
+RUN apk add --no-cache imagemagick librsvg rsvg-convert || apk add --no-cache imagemagick librsvg
 
 # Copy backend code
 COPY backend/ ./

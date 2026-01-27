@@ -256,8 +256,12 @@ function MobileDashboard({
       <header className="mobile-header">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-              <Grid size={20} />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 10.5L12 3l9 7.5" />
+                <path d="M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9" />
+                <polyline points="8 15 10 15 11 12 13 18 14 15 16 15" strokeWidth="1.5" />
+              </svg>
             </div>
             <div className="min-w-0">
               <h1 className="text-lg font-semibold truncate">{settings.title}</h1>
@@ -436,7 +440,7 @@ function MobileDashboard({
                         <div className="flex-1">
                           <span className="font-medium">{card.name}</span>
                           <p className="text-xs text-white/50">
-                            {isUp ? `${status?.lastCheck?.responseTime || 0}ms` : isDown ? (status?.lastCheck?.error || t('offline')) : t('checking')}
+                            {isUp ? `${status?.lastCheck?.ping || 0}ms` : isDown ? (status?.lastCheck?.msg || t('offline')) : t('checking')}
                           </p>
                         </div>
                         <span className={`text-sm font-medium ${isUp ? 'text-green-400' : isDown ? 'text-red-400' : 'text-gray-400'}`}>
@@ -523,17 +527,25 @@ function MobileDashboard({
                   {status?.checks?.length > 0 && (
                     <div className="mobile-card p-4">
                       <h4 className="text-sm text-white/50 mb-3">{t('recentChecks')}</h4>
-                      <div className="flex gap-1 flex-wrap">
-                        {status.checks.slice(-30).map((check, i) => (
-                          <div 
-                            key={i}
-                            className={`w-2 h-6 rounded-sm ${
-                              check.status === 'up' ? 'bg-green-500' :
-                              check.status === 'down' ? 'bg-red-500' :
-                              'bg-yellow-500'
-                            }`}
-                          />
-                        ))}
+                      <div className="flex gap-0.5">
+                        {status.checks.slice(-30).map((check, i) => {
+                          // Поддержка как числовых статусов (0,1,2,3) так и строковых
+                          const statusName = typeof check.status === 'number' 
+                            ? ['down', 'up', 'pending', 'maintenance'][check.status] 
+                            : (check.status || 'unknown');
+                          return (
+                            <div 
+                              key={i}
+                              className={`flex-1 min-w-[2px] h-6 rounded-sm ${
+                                statusName === 'up' ? 'bg-green-500' :
+                                statusName === 'down' ? 'bg-red-500' :
+                                statusName === 'pending' ? 'bg-yellow-500' :
+                                'bg-gray-500'
+                              }`}
+                              title={`${new Date(check.timestamp).toLocaleTimeString('ru-RU')} - ${statusName.toUpperCase()}`}
+                            />
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -757,6 +769,55 @@ function MobileDashboard({
                           <MetricItem label="RAM" value={`${data.memory?.percent || 0}%`} />
                           <MetricItem label="Uptime" value={data.uptime?.formatted || 'N/A'} color="text-green-400" />
                           {data.hostname && <MetricItem label="Hostname" value={data.hostname} />}
+                        </>
+                      );
+                    }
+                    
+                    if (intType === 'homeassistant') {
+                      return (
+                        <>
+                          <MetricItem label="Освещение" value={`${data.entityCounts?.lightsOn || 0}/${data.entityCounts?.lights || 0}`} color="text-yellow-400" />
+                          <MetricItem label="Выключатели" value={`${data.entityCounts?.switchesOn || 0}/${data.entityCounts?.switches || 0}`} color="text-blue-400" />
+                          <MetricItem label="Датчики" value={data.entityCounts?.sensors || 0} />
+                          <MetricItem label="Автоматизации" value={data.entityCounts?.automations || 0} />
+                          {data.customEntities && data.customEntities.length > 0 && (
+                            <div className="pt-2 mt-2 border-t border-white/5">
+                              <div className="text-xs text-white/40 mb-2">Отслеживаемые</div>
+                              <div className="space-y-1.5">
+                                {data.customEntities.slice(0, 5).map((entity, i) => (
+                                  <div key={i} className="flex items-center justify-between text-xs">
+                                    <span className="text-white/80 truncate flex-1">{entity.name}</span>
+                                    <span className={`font-medium ${
+                                      entity.state === 'on' ? 'text-yellow-400' : 
+                                      entity.state === 'off' ? 'text-white/40' : 
+                                      entity.domain === 'sensor' ? 'text-cyan-400' : 'text-white'
+                                    }`}>
+                                      {entity.state}{entity.unit ? ` ${entity.unit}` : ''}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    }
+                    
+                    if (intType === 'wikijs') {
+                      return (
+                        <>
+                          <MetricItem label="Страницы" value={data.totalPages || 0} />
+                          <MetricItem label="Обновлено (7д)" value={data.recentPages || 0} color="text-green-400" />
+                          <MetricItem label="Пользователи" value={`${data.activeUsers || 0}/${data.totalUsers || 0}`} />
+                        </>
+                      );
+                    }
+                    
+                    if (intType === 'npm') {
+                      return (
+                        <>
+                          <MetricItem label="Активные хосты" value={data.enabledHosts || 0} color="text-green-400" />
+                          <MetricItem label="Всего хостов" value={data.totalHosts || 0} />
                         </>
                       );
                     }

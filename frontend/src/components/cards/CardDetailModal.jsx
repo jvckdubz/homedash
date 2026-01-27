@@ -464,19 +464,47 @@ function CardDetailModal({ card, data, onClose }) {
                   {/* Current Status */}
                   <div className="glass-card p-4">
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-dark-400">Текущий статус</span>
+                      <span className="text-dark-400">Current Status</span>
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                         data.monitoringStatus.status === 'up' ? 'bg-green-500/20 text-green-400' :
                         data.monitoringStatus.status === 'down' ? 'bg-red-500/20 text-red-400' :
-                        'bg-yellow-500/20 text-yellow-400'
+                        data.monitoringStatus.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                        data.monitoringStatus.status === 'maintenance' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-gray-500/20 text-gray-400'
                       }`}>
                         {data.monitoringStatus.status === 'up' ? 'Online' : 
-                         data.monitoringStatus.status === 'down' ? 'Offline' : 'Degraded'}
+                         data.monitoringStatus.status === 'down' ? 'Offline' : 
+                         data.monitoringStatus.status === 'pending' ? 'Pending' :
+                         data.monitoringStatus.status === 'maintenance' ? 'Maintenance' :
+                         'Unknown'}
                       </span>
                     </div>
-                    {data.monitoringStatus.checks?.length > 0 && (
-                      <div className="text-sm text-dark-400">
-                        Последняя проверка: {new Date(data.monitoringStatus.checks[data.monitoringStatus.checks.length - 1]?.timestamp).toLocaleString('ru-RU')}
+                    {data.monitoringStatus.lastCheck && (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-dark-400">Last Check</span>
+                          <span className="text-dark-300">
+                            {new Date(data.monitoringStatus.lastCheck.timestamp).toLocaleString('ru-RU')}
+                          </span>
+                        </div>
+                        {data.monitoringStatus.lastCheck.ping && (
+                          <div className="flex justify-between">
+                            <span className="text-dark-400">Response Time</span>
+                            <span className="text-dark-300">{data.monitoringStatus.lastCheck.ping}ms</span>
+                          </div>
+                        )}
+                        {data.monitoringStatus.lastCheck.msg && data.monitoringStatus.status !== 'up' && (
+                          <div className="flex justify-between">
+                            <span className="text-dark-400">Message</span>
+                            <span className="text-red-400 text-right max-w-[200px] truncate">{data.monitoringStatus.lastCheck.msg}</span>
+                          </div>
+                        )}
+                        {data.monitoringStatus.lastCheck.retries > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-dark-400">Retry Count</span>
+                            <span className="text-yellow-400">{data.monitoringStatus.lastCheck.retries}</span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -509,19 +537,31 @@ function CardDetailModal({ card, data, onClose }) {
                   {/* Recent Checks */}
                   {data.monitoringStatus.checks?.length > 0 && (
                     <div className="glass-card p-4">
-                      <h4 className="text-sm text-dark-400 mb-3">Последние проверки</h4>
-                      <div className="flex gap-1">
-                        {data.monitoringStatus.checks.slice(-50).map((check, i) => (
-                          <div 
-                            key={i}
-                            className={`w-2 h-6 rounded-sm ${
-                              check.status === 'up' ? 'bg-green-500' :
-                              check.status === 'down' ? 'bg-red-500' :
-                              'bg-yellow-500'
-                            }`}
-                            title={`${new Date(check.timestamp).toLocaleTimeString('ru-RU')} - ${check.status} ${check.responseTime ? `(${check.responseTime}ms)` : ''}`}
-                          />
-                        ))}
+                      <h4 className="text-sm text-dark-400 mb-3">Recent Checks</h4>
+                      <div className="flex gap-0.5">
+                        {data.monitoringStatus.checks.slice(-50).map((check, i) => {
+                          // Поддержка как числовых статусов (0,1,2,3) так и строковых
+                          const status = typeof check.status === 'number' 
+                            ? ['down', 'up', 'pending', 'maintenance'][check.status] 
+                            : (check.statusName || check.status);
+                          return (
+                            <div 
+                              key={i}
+                              className={`flex-1 min-w-[2px] h-6 rounded-sm transition-all hover:scale-110 ${
+                                status === 'up' ? 'bg-green-500' :
+                                status === 'down' ? 'bg-red-500' :
+                                status === 'pending' ? 'bg-yellow-500' :
+                                status === 'maintenance' ? 'bg-blue-500' :
+                                'bg-gray-500'
+                              }`}
+                              title={`${new Date(check.timestamp).toLocaleTimeString('ru-RU')} - ${(status || 'unknown').toUpperCase()} ${check.ping ? `(${check.ping}ms)` : ''}`}
+                            />
+                          );
+                        })}
+                      </div>
+                      <div className="flex justify-between text-xs text-dark-500 mt-2">
+                        <span>Older</span>
+                        <span>Recent</span>
                       </div>
                     </div>
                   )}

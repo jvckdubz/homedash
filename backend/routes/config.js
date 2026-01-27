@@ -126,6 +126,50 @@ router.get('/export', async (req, res) => {
       console.log('[Export] No custom icons to backup');
     }
     
+    // Add status page config if exists
+    try {
+      const statusPageFile = path.join(DATA_DIR, 'status-page.json');
+      const statusPageContent = await fs.readFile(statusPageFile);
+      zip.addFile('status-page.json', statusPageContent);
+    } catch (err) {
+      console.log('[Export] No status page config to backup');
+    }
+    
+    // Add status page logos if they exist
+    try {
+      const logosDir = path.join(DATA_DIR, 'status-logos');
+      const files = await fs.readdir(logosDir);
+      for (const file of files) {
+        const filePath = path.join(logosDir, file);
+        const stat = await fs.stat(filePath);
+        if (stat.isFile()) {
+          const content = await fs.readFile(filePath);
+          zip.addFile(`status-logos/${file}`, content);
+        }
+      }
+    } catch (err) {
+      console.log('[Export] No status logos to backup');
+    }
+    
+    // Add push notification files if they exist
+    try {
+      const vapidFile = path.join(DATA_DIR, 'vapid-keys.json');
+      const vapidContent = await fs.readFile(vapidFile);
+      zip.addFile('vapid-keys.json', vapidContent);
+      console.log('[Export] VAPID keys added to backup');
+    } catch (err) {
+      console.log('[Export] No VAPID keys to backup');
+    }
+    
+    try {
+      const subsFile = path.join(DATA_DIR, 'push-subscriptions.json');
+      const subsContent = await fs.readFile(subsFile);
+      zip.addFile('push-subscriptions.json', subsContent);
+      console.log('[Export] Push subscriptions added to backup');
+    } catch (err) {
+      console.log('[Export] No push subscriptions to backup');
+    }
+    
     // Send ZIP file
     const zipBuffer = zip.toBuffer();
     res.setHeader('Content-Type', 'application/zip');
@@ -179,6 +223,43 @@ router.post('/import', backupUpload.single('backup'), async (req, res) => {
           await fs.writeFile(filePath, entry.getData());
         }
         console.log(`[Import] Restored ${iconEntries.length} custom icons`);
+      }
+      
+      // Restore status page config
+      const statusPageEntry = entries.find(e => e.entryName === 'status-page.json');
+      if (statusPageEntry) {
+        const filePath = path.join(DATA_DIR, 'status-page.json');
+        await fs.writeFile(filePath, statusPageEntry.getData());
+        console.log('[Import] Restored status page config');
+      }
+      
+      // Restore status page logos
+      const logoEntries = entries.filter(e => e.entryName.startsWith('status-logos/') && !e.isDirectory);
+      if (logoEntries.length > 0) {
+        const logosDir = path.join(DATA_DIR, 'status-logos');
+        await fs.mkdir(logosDir, { recursive: true });
+        for (const entry of logoEntries) {
+          const fileName = path.basename(entry.entryName);
+          const filePath = path.join(logosDir, fileName);
+          await fs.writeFile(filePath, entry.getData());
+        }
+        console.log(`[Import] Restored ${logoEntries.length} status page logos`);
+      }
+      
+      // Restore VAPID keys
+      const vapidEntry = entries.find(e => e.entryName === 'vapid-keys.json');
+      if (vapidEntry) {
+        const filePath = path.join(DATA_DIR, 'vapid-keys.json');
+        await fs.writeFile(filePath, vapidEntry.getData());
+        console.log('[Import] Restored VAPID keys');
+      }
+      
+      // Restore push subscriptions
+      const pushSubsEntry = entries.find(e => e.entryName === 'push-subscriptions.json');
+      if (pushSubsEntry) {
+        const filePath = path.join(DATA_DIR, 'push-subscriptions.json');
+        await fs.writeFile(filePath, pushSubsEntry.getData());
+        console.log('[Import] Restored push subscriptions');
       }
       
     } else if (req.body && req.body.config) {

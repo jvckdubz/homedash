@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Server, RefreshCw, Container, Activity, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Server, RefreshCw, Container, Activity, ExternalLink, AlertCircle, CheckCircle2, Bug } from 'lucide-react';
 import api from '../../api';
+import { Toggle } from '../common';
 
 function SystemInfoSection() {
   const [systemInfo, setSystemInfo] = useState(null);
   const [updateInfo, setUpdateInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [debugMode, setDebugMode] = useState(() => localStorage.getItem('homedash-debug') === 'true');
+
+  const handleDebugToggle = (value) => {
+    setDebugMode(value);
+    localStorage.setItem('homedash-debug', value ? 'true' : 'false');
+    // Dispatch event for other components to react
+    window.dispatchEvent(new CustomEvent('homedash-debug-change', { detail: value }));
+  };
 
   const loadInfo = async () => {
     try {
@@ -263,6 +272,28 @@ function SystemInfoSection() {
           </div>
         </div>
       )}
+
+      {/* Режим отладки */}
+      <div className="p-4 bg-dark-800/50 rounded-xl">
+        <h3 className="font-medium mb-3 flex items-center gap-2">
+          <Bug size={18} className="text-orange-400" />
+          Отладка
+        </h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm text-dark-300">Режим отладки</div>
+            <div className="text-xs text-dark-500">Позволяет имитировать недоступность сервисов</div>
+          </div>
+          <Toggle checked={debugMode} onChange={handleDebugToggle} />
+        </div>
+        {debugMode && (
+          <div className="mt-3 p-2 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+            <div className="text-xs text-orange-400">
+              В настройках карточек с мониторингом появился тоггл "Имитировать недоступность"
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

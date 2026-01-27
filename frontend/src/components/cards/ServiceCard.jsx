@@ -126,12 +126,16 @@ function ServiceCard({ card, onEdit, onDelete, integrationData, onShowDetail, mo
               className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${
                 monStatus === 'up' ? 'bg-green-500 shadow-lg shadow-green-500/50' :
                 monStatus === 'down' ? 'bg-red-500 shadow-lg shadow-red-500/50 animate-pulse' :
+                monStatus === 'pending' ? 'bg-yellow-500 shadow-lg shadow-yellow-500/50 animate-pulse' :
+                monStatus === 'maintenance' ? 'bg-blue-500 shadow-lg shadow-blue-500/50' :
                 'bg-gray-500'
               }`}
               title={
-                monStatus === 'up' ? `Online • ${monitoringStatus?.lastCheck?.responseTime || 0}ms` :
-                monStatus === 'down' ? `Offline • ${monitoringStatus?.lastCheck?.error || 'No response'}` :
-                'Checking...'
+                monStatus === 'up' ? `Online | ${monitoringStatus?.lastCheck?.ping || 0}ms` :
+                monStatus === 'down' ? `Offline | ${monitoringStatus?.lastCheck?.msg || 'No response'}` :
+                monStatus === 'pending' ? `Checking... (retry ${monitoringStatus?.lastCheck?.retries || 0})` :
+                monStatus === 'maintenance' ? 'Maintenance' :
+                'Unknown'
               }
             />
           )}
@@ -173,18 +177,24 @@ function ServiceCard({ card, onEdit, onDelete, integrationData, onShowDetail, mo
                   <div className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${
                       monStatus === 'up' ? 'bg-green-500' : 
-                      monStatus === 'down' ? 'bg-red-500' : 'bg-yellow-500'
+                      monStatus === 'down' ? 'bg-red-500' : 
+                      monStatus === 'pending' ? 'bg-yellow-500 animate-pulse' :
+                      'bg-gray-500'
                     }`} />
-                    <span className="text-dark-400">Uptime 24h:</span>
-                    <span className={`font-medium ${
-                      parseFloat(monitoringStatus.stats['24h'].uptime) >= 99 ? 'text-green-400' :
-                      parseFloat(monitoringStatus.stats['24h'].uptime) >= 95 ? 'text-yellow-400' :
-                      'text-red-400'
-                    }`}>
-                      {monitoringStatus.stats['24h'].uptime}%
+                    <span className="text-dark-400">
+                      {monStatus === 'pending' ? 'Checking...' : 'Uptime 24h:'}
                     </span>
+                    {monStatus !== 'pending' && (
+                      <span className={`font-medium ${
+                        parseFloat(monitoringStatus.stats['24h'].uptime) >= 99 ? 'text-green-400' :
+                        parseFloat(monitoringStatus.stats['24h'].uptime) >= 95 ? 'text-yellow-400' :
+                        'text-red-400'
+                      }`}>
+                        {monitoringStatus.stats['24h'].uptime}%
+                      </span>
+                    )}
                   </div>
-                  {monitoringStatus.stats['24h'].avgResponseTime && (
+                  {monitoringStatus.stats['24h'].avgResponseTime && monStatus !== 'pending' && (
                     <span className="text-dark-500">
                       ~{monitoringStatus.stats['24h'].avgResponseTime}ms
                     </span>

@@ -471,6 +471,12 @@ input[type="color"] {
     min-height: 44px;
     min-width: 44px;
   }
+  
+  /* Исключение для маленьких иконок-кнопок (крестики удаления и т.п.) */
+  button.btn-xs {
+    min-height: auto;
+    min-width: auto;
+  }
 }
 
 /* iOS-style Toggle Switch */
